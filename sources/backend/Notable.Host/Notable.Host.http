@@ -1,0 +1,6 @@
+@Notable.Host_HostAddress = http://localhost:5203
+
+GET {{Notable.Host_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

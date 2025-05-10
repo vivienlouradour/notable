@@ -1,0 +1,33 @@
+version: "3.9"
+services:
+  notable-backend:
+    build: ./sources/backend
+    container_name: notable-backend
+    ports:
+      - "5000:80"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    depends_on:
+      - couchdb
+
+  notable-webapp:
+    build: ./sources/webapp
+    container_name: notable-webapp
+    ports:
+      - "4200:80"
+    depends_on:
+      - backend
+
+  notable-couchdb:
+    image: couchdb:3.3
+    container_name: notable-couchdb
+    ports:
+      - "5984:5984"
+    environment:
+      - COUCHDB_USER=admin
+      - COUCHDB_PASSWORD=admin
+    volumes:
+      - couchdb_data:/opt/couchdb/data
+
+volumes:
+  couchdb_data:

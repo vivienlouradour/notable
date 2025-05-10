@@ -1,0 +1,7 @@
+<h2>Mes notes</h2>
+<textarea [(ngModel)]="noteContent"></textarea>
+<button (click)="saveNote()">Enregistrer</button>
+
+<ul>
+  <li *ngFor="let note of notes">{{ note.content }}</li>
+</ul>
