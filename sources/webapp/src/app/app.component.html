@@ -177,6 +177,7 @@
   }
 </style>
 
+<app-nav-bar />
 <main class="main">
   <div class="content">
     <div class="left-side">
@@ -227,8 +228,9 @@
       </svg>
       <h1>Hello, {{ title }}</h1>
       <p>Congratulations! Your app is running. 🎉</p>
-      <app-note-quick-create></app-note-quick-create>
-      <app-notes></app-notes>
+      <app-note-quick-create />
+      <app-notes />
+      <app-theme-switcher />
     </div>
     <div class="divider" role="separator" aria-label="Divider"></div>
     <div class="right-side">
