@@ -4,13 +4,21 @@ import { NoteQuickCreateComponent } from "./shared/components/note-quick-create/
 import { NotesComponent } from "./features/notes/notes.component";
 import { ThemeSwitcherComponent } from "./shared/components/theme-switcher/theme-switcher.component";
 import { NavBarComponent } from "./shared/components/nav-bar/nav-bar.component";
+import { TranslateService } from '@ngx-translate/core';
+import { LangSwitcherComponent } from "./shared/components/lang-switcher/lang-switcher.component";
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, NavBarComponent, NoteQuickCreateComponent, NotesComponent, ThemeSwitcherComponent, NavBarComponent],
+  imports: [RouterOutlet, NavBarComponent, NoteQuickCreateComponent, NotesComponent, ThemeSwitcherComponent, NavBarComponent, LangSwitcherComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
 export class AppComponent {
   title = 'notable';
+
+  constructor(private translate: TranslateService) {
+    this.translate.addLangs(['fr', 'en']);
+    this.translate.setDefaultLang('en');
+    this.translate.use('en');
+  }
 }

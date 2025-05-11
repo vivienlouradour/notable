@@ -1,0 +1,10 @@
+{
+  "test": "Test in english",
+  "shared": {
+    "language": {
+      "choose": "Choose language",
+      "fr": "French",
+      "en": "English"
+    }
+  }
+}
