@@ -1,6 +1,7 @@
 import { Injectable } from "@angular/core";
 import { BehaviorSubject, from, Observable } from "rxjs";
 import { Note, NoteBase } from "../shared/models/note.model";
+import { environment } from '../../environments/environment';
 import PouchDB from 'pouchdb';
 
 @Injectable({ providedIn: 'root' })
@@ -8,8 +9,8 @@ export class NoteService {
   private db: PouchDB.Database<NoteDocument>;
   private notesSubject = new BehaviorSubject<Note[]>([]);
 
-  private databaseName = "notes-local";
-  private couchDbUrl = "http://admin:admin@192.168.0.61:5984";
+  private databaseName = environment.localDbName;
+  private couchDbUrl = environment.couchDbUrl;
 
   constructor() {
     this.db = new PouchDB(this.databaseName);
