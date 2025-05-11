@@ -1,0 +1,11 @@
+<h1 class="text-3xl font-bold">
+  Existing notes
+</h1>
+
+<ul class="list-disc">
+  <li *ngFor="let note of notes">
+    Title : {{ note.title }} - Content : {{ note.content }} 
+    <button class="btn" (click)="updateNote(note.id)">Update note</button>
+    <button class="btn" (click)="deleteNote(note.id, note.rev)">Delete note</button>
+  </li>
+</ul>
