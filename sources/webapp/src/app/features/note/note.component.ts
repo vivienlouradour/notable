@@ -8,7 +8,7 @@ import PouchDB from 'pouchdb';
   imports: [FormsModule, NgFor],
   standalone: true,
   templateUrl: './note.component.html',
-  styleUrl: './note.component.scss'
+  styleUrl: './note.component.css'
 })
 export class NoteComponent implements OnInit {
   private db: PouchDB.Database;

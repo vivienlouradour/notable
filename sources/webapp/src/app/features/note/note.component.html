@@ -1,7 +1,13 @@
 <h2>Mes notes</h2>
-<textarea [(ngModel)]="noteContent"></textarea>
-<button (click)="saveNote()">Enregistrer</button>
+<div className="grid w-full gap-2">
+  <textarea class="textarea" [(ngModel)]="noteContent" placeholder="Type new note..."></textarea>
+  <button class="btn" (click)="saveNote()">Add note</button>
+</div>
 
-<ul>
+<ul class="list-disc">
   <li *ngFor="let note of notes">{{ note.content }}</li>
 </ul>
+
+<h1 class="text-3xl font-bold underline">
+  Hello world!
+</h1>
