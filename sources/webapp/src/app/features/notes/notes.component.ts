@@ -31,14 +31,6 @@ export class NotesComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  saveNote(title: string, content: string): Observable<string> {
-    if (!title) {
-      title = content.slice(0, 10) + "...";
-    }
-
-    return this.noteService.createNote({ title, content });
-  }
-
   deleteNote(id: string, rev: string): Observable<void> {
     return this.noteService.deleteNote(id, rev);
   }

@@ -1,6 +1,10 @@
 {
   "test": "Test en français",
   "shared": {
+    "theme": {
+      "dark": "Sombre",
+      "light": "Clair"
+    },
     "language": {
       "choose": "Choisir une langue",
       "fr": "Français",

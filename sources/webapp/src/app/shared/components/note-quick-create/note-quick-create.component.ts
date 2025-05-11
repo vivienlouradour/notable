@@ -17,6 +17,7 @@ export class NoteQuickCreateComponent {
   ) { }
 
   saveNote(): Observable<string> {
-    return this.noteService.createNote({ title: '', content: this.noteContent });
+    const title = this.noteContent.slice(0, 10) + "...";
+    return this.noteService.createNote({ title, content: this.noteContent });
   }
 }
