@@ -18,8 +18,7 @@
         <div class="divider"></div>
         <li *ngFor="let note of this.notes"><a [routerLink]="['/notes', note.id]">{{ note.title }}</a></li>
         <div class="divider">Tags</div>
-        <li><app-tag-menu-item tagName="Tag1" /></li>
-        <li><app-tag-menu-item tagName="Tag2" /></li>
+        <li *ngFor="let tag of this.tags"><app-tag-menu-item [tagName]="tag" /></li>
       </ul>
     </div>
   </div>
