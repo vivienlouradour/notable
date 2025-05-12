@@ -7,8 +7,7 @@
       <label for="my-drawer-2" class="btn btn-primary drawer-button lg:hidden">
         Open drawer
       </label>
-      <app-note-quick-create />
-      <app-notes />
+      <router-outlet />
       <app-theme-switcher />
       <app-lang-switcher />
     </div>
@@ -17,8 +16,7 @@
       <ul class="menu bg-base-200 text-base-content min-h-full w-80 p-4">
         <input type="text" placeholder="Search" class="input input-bordered w-24 md:w-auto" />
         <div class="divider"></div>
-        <li><a>Sidebar Item 1</a></li>
-        <li><a>Sidebar Item 2</a></li>
+        <li *ngFor="let note of this.notes"><a [routerLink]="['/notes', note.id]">{{ note.title }}</a></li>
         <div class="divider">Tags</div>
         <li><app-tag-menu-item tagName="Tag1" /></li>
         <li><app-tag-menu-item tagName="Tag2" /></li>
@@ -26,5 +24,3 @@
     </div>
   </div>
 </div>
-
-<router-outlet />

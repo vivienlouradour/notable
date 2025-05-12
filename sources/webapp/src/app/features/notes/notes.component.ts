@@ -3,10 +3,11 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { NoteService } from '../../core/note.service';
 import { Note } from '../../shared/models/note.model';
 import { Observable, Subject, takeUntil } from 'rxjs';
+import { NoteQuickCreateComponent } from '../../shared/components/note-quick-create/note-quick-create.component';
 
 @Component({
   selector: 'app-notes',
-  imports: [NgFor],
+  imports: [NgFor, NoteQuickCreateComponent],
   templateUrl: './notes.component.html',
   styleUrl: './notes.component.css'
 })

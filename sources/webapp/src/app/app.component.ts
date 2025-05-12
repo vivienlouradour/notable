@@ -1,25 +1,45 @@
-import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
-import { NoteQuickCreateComponent } from "./shared/components/note-quick-create/note-quick-create.component";
-import { NotesComponent } from "./features/notes/notes.component";
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { RouterLink, RouterOutlet } from '@angular/router';
 import { ThemeSwitcherComponent } from "./shared/components/theme-switcher/theme-switcher.component";
 import { NavBarComponent } from "./shared/components/nav-bar/nav-bar.component";
 import { TranslateService } from '@ngx-translate/core';
 import { LangSwitcherComponent } from "./shared/components/lang-switcher/lang-switcher.component";
 import { TagMenuItemComponent } from './shared/components/tag-menu-item/tag-menu-item.component';
+import { NoteService } from './core/note.service';
+import { Note } from './shared/models/note.model';
+import { Subject, takeUntil } from 'rxjs';
+import { NgFor } from '@angular/common';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, NavBarComponent, NoteQuickCreateComponent, NotesComponent, ThemeSwitcherComponent, NavBarComponent, LangSwitcherComponent, TagMenuItemComponent],
+  imports: [RouterOutlet, NavBarComponent, ThemeSwitcherComponent, NavBarComponent, LangSwitcherComponent, TagMenuItemComponent, NgFor, RouterLink],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
-export class AppComponent {
+export class AppComponent implements OnInit, OnDestroy {
   title = 'notable';
+  private destroy$ = new Subject<void>();
+  protected notes: Note[] = [];
 
-  constructor(private translate: TranslateService) {
+  constructor(
+    private translate: TranslateService,
+    private noteService: NoteService) {
     this.translate.addLangs(['fr', 'en']);
     this.translate.setDefaultLang('en');
     this.translate.use('en');
   }
+
+  ngOnInit(): void {
+    this.noteService
+      .notes$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(notes => this.notes = notes);
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+
 }

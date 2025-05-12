@@ -1,0 +1,5 @@
+<div *ngIf="note" className="grid w-full gap-2">
+  <input type="text" [(ngModel)]="note.title" placeholder="Title..." class="input" />
+  <textarea class="textarea" [(ngModel)]="note.content" placeholder="Note content..."></textarea>
+  <button class="btn" (click)="updateNote()">Update note</button>
+</div>
