@@ -4,6 +4,7 @@ import { NoteService } from '../../core/note.service';
 import { Note } from '../../shared/models/note.model';
 import { Observable, Subject, takeUntil } from 'rxjs';
 import { NoteQuickCreateComponent } from '../../shared/components/note-quick-create/note-quick-create.component';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-notes',
@@ -16,7 +17,8 @@ export class NotesComponent implements OnInit, OnDestroy {
   protected notes: Note[] = [];
 
   constructor(
-    private noteService: NoteService
+    private noteService: NoteService,
+    private router: Router
   ) {
   }
 
@@ -36,7 +38,7 @@ export class NotesComponent implements OnInit, OnDestroy {
     return this.noteService.deleteNote(id, rev);
   }
 
-  updateNote(id: string): Observable<void> {
-    return this.noteService.updateNote(id, { title: 'updatedTitle', content: 'updatedContent' });
+  updateNote(id: string) {
+    this.router.navigate(['/notes', id]);
   }
 }

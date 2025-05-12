@@ -3,8 +3,8 @@ import { NoteService } from '../../core/note.service';
 import { Note } from '../../shared/models/note.model';
 import { FormsModule } from '@angular/forms';
 import { NgIf } from '@angular/common';
-import { combineLatest, map, Observable, of, Subject, takeUntil } from 'rxjs';
-import { ActivatedRoute } from '@angular/router';
+import { combineLatest, from, map, Observable, of, Subject, switchMap, takeUntil } from 'rxjs';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-note',
@@ -20,7 +20,8 @@ export class NoteComponent implements OnInit {
 
   public constructor(
     private noteService: NoteService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private router: Router
   ) { }
 
   ngOnInit(): void {
@@ -46,5 +47,14 @@ export class NoteComponent implements OnInit {
     }
 
     return of();
+  }
+
+  deleteNote() {
+    if (this.note) {
+      this.noteService.deleteNote(this.note.id, this.note.rev)
+        .subscribe({
+          complete: () => this.router.navigate(['/notes'])
+        });
+    }
   }
 }
