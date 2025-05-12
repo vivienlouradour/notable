@@ -12,4 +12,5 @@ export interface Note extends NoteBase {
 export interface NoteMetadata {
   createdAt: Date;
   updatedAt?: Date | undefined;
+  tags: string[];
 }

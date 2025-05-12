@@ -1,4 +1,5 @@
 <div className="grid w-full gap-2">
-  <textarea class="textarea" [(ngModel)]="noteContent" placeholder="Type new note..."></textarea>
+  <input type="text" [(ngModel)]="noteTitle" placeholder="Title..." class="input" />
+  <textarea class="textarea" [(ngModel)]="noteContent" placeholder="Note content..."></textarea>
   <button class="btn" (click)="saveNote()">Add note</button>
 </div>

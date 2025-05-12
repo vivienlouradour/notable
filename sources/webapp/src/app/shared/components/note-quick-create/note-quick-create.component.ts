@@ -11,13 +11,14 @@ import { FormsModule } from '@angular/forms';
 })
 export class NoteQuickCreateComponent {
   protected noteContent = '';
+  protected noteTitle = '';
 
   constructor(
     private noteService: NoteService
   ) { }
 
   saveNote(): Observable<string> {
-    const title = this.noteContent.slice(0, 10) + "...";
+    const title = this.noteTitle ?? this.noteContent.slice(0, 10) + "...";
     return this.noteService.createNote({ title, content: this.noteContent });
   }
 }

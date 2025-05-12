@@ -27,10 +27,12 @@ export class NoteService {
       content: noteDocument.content,
       metadata: {
         createdAt: new Date(noteDocument.createdAt),
-        updatedAt: noteDocument.updatedAt ? new Date(noteDocument.updatedAt) : undefined
+        updatedAt: noteDocument.updatedAt ? new Date(noteDocument.updatedAt) : undefined,
+        tags: noteDocument.tags
       }
     }
   }
+
   private syncWithCouch(): void {
     this.db.sync(`${this.couchDbUrl}/${this.databaseName}`, {
       live: true,
@@ -48,6 +50,13 @@ export class NoteService {
 
       this.notesSubject.next(notes);
     });
+  }
+
+  private parseTags(note: NoteBase): string[] {
+    const tagRegex = new RegExp('#(\\w|-|_)+', 'g');
+    const tags = [...note.content.matchAll(tagRegex)];
+
+    return tags.map(tag => tag[0]);
   }
 
   private handleSyncChanges(): void {
@@ -79,7 +88,7 @@ export class NoteService {
 
   public createNote(note: NoteBase): Observable<string> {
     const date = new Date().toISOString();
-    const newNote = { ...note, _id: date, createdAt: date } as NoteDocument;
+    const newNote = { ...note, _id: date, createdAt: date, tags: this.parseTags(note) } as NoteDocument;
 
     var createdNoteId = this.db.put(newNote).then(response => response.id);
 
@@ -92,6 +101,7 @@ export class NoteService {
         ...existingNote,
         title: note.title,
         content: note.content,
+        tags: this.parseTags(note),
         updatedAt: new Date().toISOString()
       };
 
@@ -109,4 +119,5 @@ export class NoteService {
 interface NoteDocument extends Omit<Note, 'id' | 'rev' | 'metadata'>, PouchDB.Core.IdMeta, PouchDB.Core.GetMeta {
   createdAt: string;
   updatedAt?: string;
+  tags: string[];
 }
