@@ -2,20 +2,22 @@
   <app-nav-bar />
   <div class="drawer lg:drawer-open">
     <input id="my-drawer-2" type="checkbox" class="drawer-toggle" />
-    <div class="drawer-content flex flex-col items-center justify-center">
+    <div class="drawer-content p-8">
       <!-- Page content here -->
+      <router-outlet />
+
+      <div class="divider"></div>
+      <app-theme-switcher />
+      <app-lang-switcher />
       <label for="my-drawer-2" class="btn btn-primary drawer-button lg:hidden">
         Open drawer
       </label>
-      <router-outlet />
-      <app-theme-switcher />
-      <app-lang-switcher />
     </div>
     <div class="drawer-side">
       <label for="my-drawer-2" aria-label="close sidebar" class="drawer-overlay"></label>
       <ul class="menu bg-base-200 text-base-content min-h-full w-80 p-4">
         <input type="text" placeholder="Search" class="input input-bordered w-24 md:w-auto" />
-        <div class="divider"></div>
+        <div class="divider">Notes</div>
         <li *ngFor="let note of this.notes"><a [routerLink]="['/notes', note.id]">{{ note.title }}</a></li>
         <div class="divider">Tags</div>
         <li *ngFor="let tag of this.tags"><app-tag-menu-item [tagName]="tag" /></li>
