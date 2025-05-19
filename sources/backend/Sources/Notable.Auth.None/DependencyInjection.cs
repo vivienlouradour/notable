@@ -16,17 +16,16 @@ namespace Notable.Auth.None
             services.AddTransient<IAuthService, NoneAuthService>();
             services.AddTransient<IAuthConfigMapper, NoneAuthConfigMapper>();
 
-            // Should inject a fictive user
-
             return services;
         }
 
         public static IApplicationBuilder UseNoneAuth(this IApplicationBuilder builder)
         {
+            // Inject a fictive user so any request can pass through authentication mecanism
             return builder.Use(async (context, next) =>
             {
                 var identity = new ClaimsIdentity([new Claim(ClaimTypes.Name, "Anonymous")], "None");
-
+                
                 context.User = new ClaimsPrincipal(identity);
 
                 await next();
