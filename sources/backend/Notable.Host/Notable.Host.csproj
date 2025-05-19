@@ -7,7 +7,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.5" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.4" />
+    <PackageReference Include="NSwag.AspNetCore" Version="14.4.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Notable.Auth.BuiltIn\Notable.Auth.BuiltIn.csproj" />
+    <ProjectReference Include="..\Notable.Auth.None\Notable.Auth.None.csproj" />
   </ItemGroup>
 
 </Project>
