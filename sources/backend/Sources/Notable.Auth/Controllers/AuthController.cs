@@ -22,6 +22,14 @@ namespace Notable.Auth.Controllers
             this.authConfigMapper = authConfigMapper;
         }
 
+        [HttpGet("me")]
+        public string GetCurrentUser()
+        {
+            var identity = User.Identity;
+
+            return identity?.Name ?? "";
+        }
+
         [HttpGet("config")]
         public async Task<ActionResult<AuthConfigBaseDto>> GetConfigAsync(CancellationToken cancellationToken)
         {

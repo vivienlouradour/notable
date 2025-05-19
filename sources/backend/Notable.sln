@@ -3,17 +3,17 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.13.35931.197
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Notable.Host", "Notable.Host\Notable.Host.csproj", "{DA929E04-FD03-41E5-AE8B-7890BFC76DF0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Notable.Host", "Sources\Notable.Host\Notable.Host.csproj", "{DA929E04-FD03-41E5-AE8B-7890BFC76DF0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Notable.Auth", "Notable.Auth\Notable.Auth.csproj", "{AD42B28B-9676-474C-9EF9-8E3B55922BD4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Notable.Auth", "Sources\Notable.Auth\Notable.Auth.csproj", "{AD42B28B-9676-474C-9EF9-8E3B55922BD4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Notable.Auth.BuiltIn", "Notable.Auth.BuiltIn\Notable.Auth.BuiltIn.csproj", "{919D59D5-B926-44A1-B506-C2B0564E2C35}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Notable.Auth.BuiltIn", "Sources\Notable.Auth.BuiltIn\Notable.Auth.BuiltIn.csproj", "{919D59D5-B926-44A1-B506-C2B0564E2C35}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UnitTests", "UnitTests", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sources", "Sources", "{049DFE5F-29D2-41F3-9988-AD9133CB9A8D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Notable.Auth.None", "Notable.Auth.None\Notable.Auth.None.csproj", "{8B1AAC82-ED17-4940-A77C-BD02914239FB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Notable.Auth.None", "Sources\Notable.Auth.None\Notable.Auth.None.csproj", "{8B1AAC82-ED17-4940-A77C-BD02914239FB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

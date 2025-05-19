@@ -7,6 +7,7 @@ using Notable.Auth.BuiltIn;
 using Notable.Auth.None;
 using Notable.Host.Exceptions;
 
+using System.Security.Claims;
 using System.Text;
 
 namespace Notable.Host
@@ -26,7 +27,6 @@ namespace Notable.Host
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 
             builder.Services
-                .AddOpenApi()
                 .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {
@@ -44,11 +44,11 @@ namespace Notable.Host
 
             if (builder.Configuration.HasAuthModeConfigured("none"))
             {
-                builder.Services.AddNoneAuthentication();
+                builder.Services.AddNoneAuth();
             }
             else if (builder.Configuration.HasAuthModeConfigured("builtin"))
             {
-                builder.Services.AddBuiltInAuthentication();
+                builder.Services.AddBuiltInAuth();
             }
             else
             {
@@ -68,6 +68,12 @@ namespace Notable.Host
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
+
+            // None auth middleware
+            if (builder.Configuration.HasAuthModeConfigured("none"))
+            {
+                app.UseNoneAuth();
+            }
 
 
             app.MapControllers();

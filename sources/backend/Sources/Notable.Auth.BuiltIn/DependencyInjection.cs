@@ -8,7 +8,7 @@ namespace Notable.Auth.BuiltIn
 {
     public static class DependencyInjection
     {
-        public static IServiceCollection AddBuiltInAuthentication(this IServiceCollection services)
+        public static IServiceCollection AddBuiltInAuth(this IServiceCollection services)
         {
             services.AddTransient<IAuthService, BuiltInAuthService>();
             services.AddTransient<IAuthConfigMapper, BuiltInAuthConfigMapper>();
