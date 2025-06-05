@@ -4,7 +4,7 @@ using Notable.Auth.Services;
 
 namespace Notable.Auth.BuiltIn
 {
-    public class BuiltInAuthService : IAuthService
+    internal class BuiltInAuthService : IAuthService
     {
         public Task<AuthConfigBase> GetConfigurationAsync(CancellationToken cancellationToken)
         {

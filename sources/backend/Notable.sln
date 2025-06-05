@@ -15,6 +15,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sources", "Sources", "{049D
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Notable.Auth.None", "Sources\Notable.Auth.None\Notable.Auth.None.csproj", "{8B1AAC82-ED17-4940-A77C-BD02914239FB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Notable.CouchDb", "Sources\Notable.CouchDb\Notable.CouchDb.csproj", "{E9B2E0AE-49DD-4FE8-910C-D76870B89B6F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -37,6 +39,10 @@ Global
 		{8B1AAC82-ED17-4940-A77C-BD02914239FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8B1AAC82-ED17-4940-A77C-BD02914239FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8B1AAC82-ED17-4940-A77C-BD02914239FB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E9B2E0AE-49DD-4FE8-910C-D76870B89B6F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E9B2E0AE-49DD-4FE8-910C-D76870B89B6F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E9B2E0AE-49DD-4FE8-910C-D76870B89B6F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E9B2E0AE-49DD-4FE8-910C-D76870B89B6F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -46,6 +52,7 @@ Global
 		{AD42B28B-9676-474C-9EF9-8E3B55922BD4} = {049DFE5F-29D2-41F3-9988-AD9133CB9A8D}
 		{919D59D5-B926-44A1-B506-C2B0564E2C35} = {049DFE5F-29D2-41F3-9988-AD9133CB9A8D}
 		{8B1AAC82-ED17-4940-A77C-BD02914239FB} = {049DFE5F-29D2-41F3-9988-AD9133CB9A8D}
+		{E9B2E0AE-49DD-4FE8-910C-D76870B89B6F} = {049DFE5F-29D2-41F3-9988-AD9133CB9A8D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {584C856E-D904-4959-B03D-1DEBEE3CBEAE}

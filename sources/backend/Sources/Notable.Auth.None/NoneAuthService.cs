@@ -5,7 +5,7 @@ using Notable.Auth.Services;
 
 namespace Notable.Auth.None
 {
-    public class NoneAuthService : IAuthService
+    internal class NoneAuthService : IAuthService
     {
         public Task<AuthConfigBase> GetConfigurationAsync(CancellationToken cancellationToken)
         {
