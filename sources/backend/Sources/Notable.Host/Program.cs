@@ -1,13 +1,8 @@
-
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 
-using Notable.Auth;
-using Notable.Auth.BuiltIn;
-using Notable.Auth.None;
-using Notable.Host.Exceptions;
+using Notable.CouchDb;
 
-using System.Security.Claims;
 using System.Text;
 
 namespace Notable.Host
@@ -18,19 +13,17 @@ namespace Notable.Host
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
-
-            builder.Services.AddControllers();
-
+            builder.Services
+                .AddControllers()
+                .HideBuiltInLoginControllerIfNecessary(builder.Configuration);
+            
             builder.Services.AddOpenApiDocument();
-
-            // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 
             builder.Services
                 .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {
-                    options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+                    options.TokenValidationParameters = new TokenValidationParameters
                     {
                         ValidateIssuer = true,
                         ValidateAudience = true,
@@ -41,19 +34,23 @@ namespace Notable.Host
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("Jwt:Key"))
                     };
                 });
+            builder.Services.AddHttpClient();
+            builder.Services.AddHttpContextAccessor();
+            
+            // Cors policy
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAngular", policy =>
+                {
+                    policy.WithOrigins("http://localhost:4200")
+                          .AllowAnyHeader()
+                          .AllowAnyMethod()
+                          .AllowCredentials(); // TODO : Check if AllowCredentials could be removed (necessary for cookie)
+                });
+            });
 
-            if (builder.Configuration.HasAuthModeConfigured("none"))
-            {
-                builder.Services.AddNoneAuth();
-            }
-            else if (builder.Configuration.HasAuthModeConfigured("builtin"))
-            {
-                builder.Services.AddBuiltInAuth();
-            }
-            else
-            {
-                throw new ConfigurationException("No auth mode configured");
-            }
+            builder.Services.AddCouchDb();
+            builder.Services.ConfigureNotableAuth(builder.Configuration);
 
             var app = builder.Build();
 
@@ -64,17 +61,14 @@ namespace Notable.Host
 
                 app.UseSwaggerUi();
             }
-
-            app.UseHttpsRedirection();
-
+            else
+            {
+                app.UseHttpsRedirection();
+            }
+            app.UseAuthentication();
             app.UseAuthorization();
 
-            // None auth middleware
-            if (builder.Configuration.HasAuthModeConfigured("none"))
-            {
-                app.UseNoneAuth();
-            }
-
+            app.UseCors("AllowAngular");
 
             app.MapControllers();
 

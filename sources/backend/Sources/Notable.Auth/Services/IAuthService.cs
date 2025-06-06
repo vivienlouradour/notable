@@ -19,6 +19,5 @@ namespace Notable.Auth.Services
         /// <returns>The JWT token if login successfull.</returns>
         /// <exception cref="AuthInvalidOperationException">Throw if the authentication mode does not allow login request through API.</exception>
         Task<string> LoginAsync(LoginRequest loginRequest, CancellationToken cancellationToken);
-
     }
 }

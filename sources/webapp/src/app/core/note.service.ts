@@ -34,7 +34,7 @@ export class NoteService {
   }
 
   private syncWithCouch(): void {
-    this.db.sync(`${this.couchDbUrl}/${this.databaseName}`, {
+    this.db.sync(`${this.couchDbUrl}`, {
       live: true,
       retry: true
     }).on('change', info => {

@@ -1,6 +1,6 @@
 export const environment = {
   production: false,
   appName: 'Notable - dev',
-  couchDbUrl: 'http://admin:admin@192.168.0.61:5984',
+  couchDbUrl: 'http://localhost:5203/sync',
   localDbName: 'notes-local',
 }
