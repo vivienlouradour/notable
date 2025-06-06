@@ -5,10 +5,5 @@
 </h1>
 
 <ul class="list-disc">
-  <li *ngFor="let note of notes">
-    Title : {{ note.title }} - Content : {{ note.content }} - Tags : <span *ngFor="let tag of note.metadata?.tags"> {{
-      tag }} </span>
-    <button class="btn" (click)="updateNote(note.id)">Update note</button>
-    <button class="btn" (click)="deleteNote(note.id, note.rev)">Delete note</button>
-  </li>
+  <app-note-preview *ngFor="let note of notes" [note]="note" />
 </ul>

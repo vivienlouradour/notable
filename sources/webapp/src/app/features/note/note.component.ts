@@ -3,7 +3,7 @@ import { NoteService } from '../../core/note.service';
 import { Note } from '../../shared/models/note.model';
 import { FormsModule } from '@angular/forms';
 import { NgIf } from '@angular/common';
-import { combineLatest, from, map, Observable, of, Subject, switchMap, takeUntil } from 'rxjs';
+import { combineLatest, map, Observable, of, Subject } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
@@ -32,8 +32,10 @@ export class NoteComponent implements OnInit {
     const routeId$ = this.route.paramMap.pipe(map(params => params.get('id')));
     const notes$ = this.noteService.notes$;
     combineLatest([routeId$, notes$])
-      .pipe(map(([id, notes]) => notes.find(note => note.id === this.noteId)))
-      .subscribe(note => this.note = note);
+      .pipe(map(([id, notes]) => notes.find(note => note.id === id)))
+      .subscribe(note => {
+        this.note = note;
+      });
   }
 
   ngOnDestroy(): void {

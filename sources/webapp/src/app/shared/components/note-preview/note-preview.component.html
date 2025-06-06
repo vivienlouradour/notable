@@ -1,0 +1,6 @@
+<div>
+  Title : {{ note.title }} - Content : {{ note.content }} - Tags : <span *ngFor="let tag of note.metadata?.tags"> {{
+    tag }} </span>
+  <a class="btn" [routerLink]="['/notes', this.note.id]">Update note</a>
+  <button class="btn" (click)="this.delete()">Delete note</button>
+</div>
