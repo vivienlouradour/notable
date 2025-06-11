@@ -19,6 +19,39 @@ export class NoteService {
     this.handleSyncChanges();
   }
 
+  public get notes$(): Observable<Note[]> {
+    return this.notesSubject.asObservable();
+  }
+
+  public createNote(note: NoteBase): Observable<string> {
+    const date = new Date().toISOString();
+    const newNote = { ...note, _id: date, createdAt: date, tags: this.parseTags(note) } as NoteDocument;
+
+    var createdNoteId = this.db.put(newNote).then(response => response.id);
+
+    return from(createdNoteId);
+  }
+
+  public updateNote(id: string, note: NoteBase): Observable<void> {
+    const updatePromise = this.db.get(id).then(existingNote => {
+      const updatedNote: NoteDocument = {
+        ...existingNote,
+        title: note.title,
+        content: note.content,
+        tags: this.parseTags(note),
+        updatedAt: new Date().toISOString()
+      };
+
+      return this.db.put(updatedNote);
+    }).then(() => { });
+
+    return from(updatePromise);
+  }
+
+  public deleteNote(id: string, rev: string): Observable<void> {
+    return from(this.db.remove(id, rev).then(() => { }));
+  }
+
   private mapToNote(noteDocument: NoteDocument): Note {
     return {
       id: noteDocument._id,
@@ -65,7 +98,6 @@ export class NoteService {
       live: true,
       include_docs: true
     }).on('change', change => {
-
       const current = this.notesSubject.value.slice();
       if (change.deleted) {
         this.notesSubject.next(current.filter(n => n.id !== change.id));
@@ -80,39 +112,6 @@ export class NoteService {
         this.notesSubject.next(current);
       }
     });
-  }
-
-  public get notes$(): Observable<Note[]> {
-    return this.notesSubject.asObservable();
-  }
-
-  public createNote(note: NoteBase): Observable<string> {
-    const date = new Date().toISOString();
-    const newNote = { ...note, _id: date, createdAt: date, tags: this.parseTags(note) } as NoteDocument;
-
-    var createdNoteId = this.db.put(newNote).then(response => response.id);
-
-    return from(createdNoteId);
-  }
-
-  public updateNote(id: string, note: NoteBase): Observable<void> {
-    const updatePromise = this.db.get(id).then(existingNote => {
-      const updatedNote: NoteDocument = {
-        ...existingNote,
-        title: note.title,
-        content: note.content,
-        tags: this.parseTags(note),
-        updatedAt: new Date().toISOString()
-      };
-
-      return this.db.put(updatedNote);
-    }).then(() => { });
-
-    return from(updatePromise);
-  }
-
-  public deleteNote(id: string, rev: string): Observable<void> {
-    return from(this.db.remove(id, rev).then(() => { }));
   }
 }
 

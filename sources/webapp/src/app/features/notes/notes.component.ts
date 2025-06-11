@@ -5,10 +5,11 @@ import { Note } from '../../shared/models/note.model';
 import { Subject, takeUntil } from 'rxjs';
 import { NoteQuickCreateComponent } from '../../shared/components/note-quick-create/note-quick-create.component';
 import { NotePreviewComponent } from "../../shared/components/note-preview/note-preview.component";
+import { CreateNoteButtonComponent } from "../../shared/components/create-note-button/create-note-button.component";
 
 @Component({
   selector: 'app-notes',
-  imports: [NgFor, NoteQuickCreateComponent, NotePreviewComponent],
+  imports: [NgFor, NoteQuickCreateComponent, NotePreviewComponent, CreateNoteButtonComponent],
   templateUrl: './notes.component.html',
   styleUrl: './notes.component.css'
 })

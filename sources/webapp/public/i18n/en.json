@@ -10,5 +10,9 @@
       "fr": "French",
       "en": "English"
     }
+  },
+  "notes": {
+    "create-btn": "Create note",
+    "default-title": "New note"
   }
 }
