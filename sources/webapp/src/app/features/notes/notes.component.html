@@ -5,6 +5,6 @@
   Existing notes
 </h1>
 
-<ul class="list-disc">
+<div class="grid grid-cols-3 gap-4">
   <app-note-preview *ngFor="let note of notes" [note]="note" />
-</ul>
+</div>

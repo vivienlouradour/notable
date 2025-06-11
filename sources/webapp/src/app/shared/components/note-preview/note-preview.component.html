@@ -1,6 +1,10 @@
-<div>
-  Title : {{ note.title }} - Content : {{ note.content }} - Tags : <span *ngFor="let tag of note.metadata?.tags"> {{
-    tag }} </span>
-  <a class="btn" [routerLink]="['/notes', this.note.id]">Update note</a>
-  <button class="btn" (click)="this.delete()">Delete note</button>
+<div class="card w-110 bg-base-100 card-xs shadow-sm">
+  <div class="card-body">
+    <h2 class="card-title">{{ note.title }} </h2>
+    <p>{{ note.content | truncate }}</p>
+    <div class="justify-end card-actions">
+      <a class="btn btn-xs" [routerLink]="['/notes', this.note.id]">Update</a>
+      <button class="btn btn-xs" (click)="this.delete()">Delete</button>
+    </div>
+  </div>
 </div>
