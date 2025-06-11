@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 
 using Notable.CouchDb;
+using Notable.Host.Middlewares;
 
 using System.Text;
 
@@ -54,6 +55,8 @@ namespace Notable.Host
 
             var app = builder.Build();
 
+            app.UseMiddleware<ExceptionHandlingMiddleware>();
+
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
@@ -65,6 +68,7 @@ namespace Notable.Host
             {
                 app.UseHttpsRedirection();
             }
+
             app.UseAuthentication();
             app.UseAuthorization();
 
