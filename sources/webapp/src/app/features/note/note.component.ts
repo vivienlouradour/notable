@@ -5,10 +5,11 @@ import { FormsModule } from '@angular/forms';
 import { NgIf } from '@angular/common';
 import { combineLatest, map, Observable, of, Subject } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
+import { NoteEditorComponent } from "../../shared/components/rich-text-editor/rich-text-editor.component";
 
 @Component({
   selector: 'app-note',
-  imports: [FormsModule, NgIf],
+  imports: [FormsModule, NgIf, NoteEditorComponent, NoteEditorComponent],
   templateUrl: './note.component.html',
   styleUrl: './note.component.css'
 })
@@ -44,6 +45,7 @@ export class NoteComponent implements OnInit {
   }
 
   updateNote(): Observable<void> {
+    debugger
     if (this.note) {
       return this.noteService.updateNote(this.noteId, this.note);
     }

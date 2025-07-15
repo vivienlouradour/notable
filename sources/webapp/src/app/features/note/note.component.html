@@ -1,6 +1,7 @@
 <div *ngIf="note" class="w-full space-y-4">
   <input class="input input-ghost w-full" type="text" [(ngModel)]="note.title" placeholder="Title..." />
-  <textarea class="textarea w-full h-100" [(ngModel)]="note.content" placeholder="Note content..."></textarea>
+  <!-- <textarea class="textarea w-full h-100" [(ngModel)]="note.content" placeholder="Note content..."></textarea> -->
+  <app-note-editor [(content)]="note.content" />
   <div class="space-x-2">
     <button class="btn" (click)="updateNote()">Update note</button>
     <button class="btn" (click)="deleteNote()">Delete note</button>
