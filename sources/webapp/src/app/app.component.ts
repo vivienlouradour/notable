@@ -8,11 +8,11 @@ import { TagMenuItemComponent } from './shared/components/tag-menu-item/tag-menu
 import { NoteService } from './core/note.service';
 import { Note } from './shared/models/note.model';
 import { Observable, Subject, takeUntil } from 'rxjs';
-import { NgFor } from '@angular/common';
+
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, NavBarComponent, ThemeSwitcherComponent, NavBarComponent, LangSwitcherComponent, TagMenuItemComponent, NgFor, RouterLink],
+  imports: [RouterOutlet, NavBarComponent, ThemeSwitcherComponent, NavBarComponent, LangSwitcherComponent, TagMenuItemComponent, RouterLink],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })

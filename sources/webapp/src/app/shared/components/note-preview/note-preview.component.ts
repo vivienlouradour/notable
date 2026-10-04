@@ -1,12 +1,12 @@
 import { Component, Input } from '@angular/core';
 import { Note } from '../../models/note.model';
-import { NgFor } from '@angular/common';
+
 import { NoteService } from '../../../core/note.service';
 import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-note-preview',
-  imports: [NgFor, RouterLink],
+  imports: [RouterLink],
   templateUrl: './note-preview.component.html',
   styleUrl: './note-preview.component.css'
 })

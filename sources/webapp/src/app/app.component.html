@@ -18,9 +18,13 @@
       <ul class="menu bg-base-200 text-base-content min-h-full w-80 p-4">
         <input type="text" placeholder="Search" class="input input-bordered w-24 md:w-auto" />
         <div class="divider">Notes</div>
-        <li *ngFor="let note of this.notes"><a [routerLink]="['/notes', note.id]">{{ note.title }}</a></li>
+        @for (note of this.notes; track note) {
+          <li><a [routerLink]="['/notes', note.id]">{{ note.title }}</a></li>
+        }
         <div class="divider">Tags</div>
-        <li *ngFor="let tag of this.tags"><app-tag-menu-item [tagName]="tag" /></li>
+        @for (tag of this.tags; track tag) {
+          <li><app-tag-menu-item [tagName]="tag" /></li>
+        }
       </ul>
     </div>
   </div>

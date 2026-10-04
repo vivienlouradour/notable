@@ -2,13 +2,13 @@ import { Component, Input, OnInit } from '@angular/core';
 import { NoteService } from '../../core/note.service';
 import { Note } from '../../shared/models/note.model';
 import { FormsModule } from '@angular/forms';
-import { NgIf } from '@angular/common';
+
 import { combineLatest, map, Observable, of, Subject } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-note',
-  imports: [FormsModule, NgIf],
+  imports: [FormsModule],
   templateUrl: './note.component.html',
   styleUrl: './note.component.css'
 })

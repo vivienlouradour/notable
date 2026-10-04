@@ -1,4 +1,4 @@
-import { NgFor } from '@angular/common';
+
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { NoteService } from '../../core/note.service';
 import { Note } from '../../shared/models/note.model';
@@ -8,7 +8,7 @@ import { NotePreviewComponent } from "../../shared/components/note-preview/note-
 
 @Component({
   selector: 'app-notes',
-  imports: [NgFor, NoteQuickCreateComponent, NotePreviewComponent],
+  imports: [NoteQuickCreateComponent, NotePreviewComponent],
   templateUrl: './notes.component.html',
   styleUrl: './notes.component.css'
 })
