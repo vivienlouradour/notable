@@ -5,8 +5,9 @@ import { NavBarComponent } from "./shared/components/nav-bar/nav-bar.component";
 import { TranslateService } from '@ngx-translate/core';
 import { LangSwitcherComponent } from "./shared/components/lang-switcher/lang-switcher.component";
 import { TagMenuItemComponent } from './shared/components/tag-menu-item/tag-menu-item.component';
-import { NoteStore } from './data/notes/note.store';
 import { Note } from './data/notes/note.model';
+import { NoteStore } from './data/notes/note.store';
+import { SyncService } from './core/persistence/pouchdb/sync.service';
 
 @Component({
   selector: 'app-root',
@@ -19,6 +20,7 @@ export class AppComponent {
   title = 'notable';
   private readonly noteStore = inject(NoteStore);
   private readonly translate = inject(TranslateService);
+  private readonly syncService = inject(SyncService);
 
   protected notes: Signal<Note[]> = this.noteStore.notes;
   protected tags: Signal<string[]> = computed(() =>
@@ -30,5 +32,7 @@ export class AppComponent {
     this.translate.addLangs(['fr', 'en']);
     this.translate.setDefaultLang('en');
     this.translate.use('en');
+
+    this.syncService.start();
   }
 }

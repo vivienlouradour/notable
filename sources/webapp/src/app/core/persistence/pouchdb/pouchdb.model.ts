@@ -8,3 +8,16 @@ export interface DocumentChange<T extends BaseDocument> {
   deleted: boolean;
   doc?: T;
 }
+
+export type SyncStatus =
+  | 'stopped'
+  | 'syncing'
+  | 'idle'
+  | 'offline'
+  | 'error'
+  | 'unauthorized';
+
+export interface SyncState {
+  status: SyncStatus;
+  error?: string;
+}

@@ -1,9 +1,9 @@
 
 import { Component, ChangeDetectionStrategy, Signal, inject } from '@angular/core';
-import { NoteStore } from '../../../data/notes/note.store';
 import { Note } from '../../../data/notes/note.model';
 import { NoteQuickCreateComponent } from '../ui/note-quick-create/note-quick-create.component';
 import { NotePreviewComponent } from "../ui/note-preview/note-preview.component";
+import { NoteStore } from '../../../data/notes/note.store';
 
 @Component({
   selector: 'app-notes-list',

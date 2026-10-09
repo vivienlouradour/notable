@@ -7,11 +7,6 @@ import { Observable } from 'rxjs';
 @Injectable({ providedIn: 'root' })
 export class PouchDbService {
   private readonly db = new PouchDB(environment.localDbName);
-  private readonly couchDbUrl = environment.couchDbUrl;
-
-  constructor() {
-    this.sync();
-  }
 
   get<T extends BaseDocument>(id: string): Promise<T> {
     return this.db.get<T>(id);
@@ -65,8 +60,8 @@ export class PouchDbService {
     });
   }
 
-  private sync(): void {
-    this.db.sync(`${this.couchDbUrl}`, {
+  public syncWith(remoteDb: PouchDB.Database) {
+    return this.db.sync(remoteDb, {
       live: true,
       retry: true
     }).on('change', info => {

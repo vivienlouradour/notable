@@ -1,6 +1,6 @@
 import { Component, ChangeDetectionStrategy, inject } from '@angular/core';
-import { NoteStore } from '../../../../data/notes/note.store';
 import { FormsModule } from '@angular/forms';
+import { NoteStore } from '../../../../data/notes/note.store';
 
 @Component({
   selector: 'app-note-quick-create',

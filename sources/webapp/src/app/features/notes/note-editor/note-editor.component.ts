@@ -1,10 +1,10 @@
 import { Component, ChangeDetectionStrategy, inject, Signal, computed } from '@angular/core';
-import { NoteStore } from '../../../data/notes/note.store';
 import { Note } from '../../../data/notes/note.model';
 import { FormsModule } from '@angular/forms';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
+import { NoteStore } from '../../../data/notes/note.store';
 
 @Component({
   selector: 'app-note-editor',
