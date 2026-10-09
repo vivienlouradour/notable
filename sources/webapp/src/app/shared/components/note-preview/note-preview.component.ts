@@ -1,23 +1,24 @@
-import { Component, Input } from '@angular/core';
-import { Note } from '../../models/note.model';
+import { Component, Input, ChangeDetectionStrategy, input } from '@angular/core';
+import { Note } from '../../../data/notes/note.model';
 
-import { NoteService } from '../../../core/note.service';
+import { NoteService } from '../../../data/notes/note.service';
 import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-note-preview',
   imports: [RouterLink],
   templateUrl: './note-preview.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrl: './note-preview.component.css'
 })
 export class NotePreviewComponent {
-  @Input() note: Note;
+  readonly note = input.required<Note>();
 
   constructor(
     private noteService: NoteService
   ) { }
 
   protected delete(): void {
-    this.noteService.deleteNote(this.note.id, this.note.rev);
+    this.noteService.deleteNote(this.note());
   }
 }

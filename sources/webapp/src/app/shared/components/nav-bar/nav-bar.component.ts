@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { environment } from '../../../../environments/environment';
 import { RouterLink } from '@angular/router';
 
@@ -6,6 +6,7 @@ import { RouterLink } from '@angular/router';
   selector: 'app-nav-bar',
   imports: [RouterLink],
   templateUrl: './nav-bar.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrl: './nav-bar.component.css'
 })
 export class NavBarComponent {

@@ -1,24 +1,22 @@
-import { Component } from '@angular/core';
-import { NoteService } from '../../../core/note.service';
-import { Observable } from 'rxjs';
+import { Component, ChangeDetectionStrategy, inject } from '@angular/core';
+import { NoteService } from '../../../data/notes/note.service';
 import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-note-quick-create',
   imports: [FormsModule],
   templateUrl: './note-quick-create.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrl: './note-quick-create.component.css'
 })
 export class NoteQuickCreateComponent {
+  private readonly noteService = inject(NoteService);
+
   protected noteContent = '';
   protected noteTitle = '';
 
-  constructor(
-    private noteService: NoteService
-  ) { }
-
-  saveNote(): Observable<string> {
+  async saveNote(): Promise<void> {
     const title = this.noteTitle ?? this.noteContent.slice(0, 10) + "...";
-    return this.noteService.createNote({ title, content: this.noteContent });
+    await this.noteService.createNote(title, this.noteContent);
   }
 }

@@ -1,10 +1,10 @@
-@if (note) {
-  <div class="w-full space-y-4">
-    <input class="input input-ghost w-full" type="text" [(ngModel)]="note.title" placeholder="Title..." />
-    <textarea class="textarea w-full h-100" [(ngModel)]="note.content" placeholder="Note content..."></textarea>
-    <div class="space-x-2">
-      <button class="btn" (click)="updateNote()">Update note</button>
-      <button class="btn" (click)="deleteNote()">Delete note</button>
-    </div>
+@if (note(); as note) {
+<div class="w-full space-y-4">
+  <input class="input input-ghost w-full" type="text" [(ngModel)]="note.title" placeholder="Title..." />
+  <textarea class="textarea w-full h-100" [(ngModel)]="note.content" placeholder="Note content..."></textarea>
+  <div class="space-x-2">
+    <button class="btn" (click)="updateNote()">Update note</button>
+    <button class="btn" (click)="deleteNote()">Delete note</button>
   </div>
+</div>
 }

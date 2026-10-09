@@ -1,8 +1,8 @@
 <div>
-  Title : {{ note.title }} - Content : {{ note.content }} - Tags : @for (tag of note.metadata?.tags; track tag) {
+  Title : {{ note().title }} - Content : {{ note().content }} - Tags : @for (tag of note().metadata.tags; track tag) {
   <span> {{
-  tag }} </span>
-}
-<a class="btn" [routerLink]="['/notes', this.note.id]">Update note</a>
-<button class="btn" (click)="this.delete()">Delete note</button>
+    tag }} </span>
+  }
+  <a class="btn" [routerLink]="['/notes', this.note().id]">Update note</a>
+  <button class="btn" (click)="this.delete()">Delete note</button>
 </div>

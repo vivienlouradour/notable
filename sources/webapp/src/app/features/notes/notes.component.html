@@ -5,7 +5,7 @@
 </h1>
 
 <ul class="list-disc">
-  @for (note of notes; track note) {
-    <app-note-preview [note]="note" />
+  @for (note of notes(); track note) {
+  <app-note-preview [note]="note" />
   }
 </ul>

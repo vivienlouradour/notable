@@ -1,4 +1,4 @@
-import { AfterViewInit, Component } from '@angular/core';
+import { AfterViewInit, Component, ChangeDetectionStrategy } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
 import { themeChange } from 'theme-change';
 
@@ -6,6 +6,7 @@ import { themeChange } from 'theme-change';
   selector: 'app-theme-switcher',
   imports: [TranslatePipe],
   templateUrl: './theme-switcher.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrl: './theme-switcher.component.css'
 })
 export class ThemeSwitcherComponent implements AfterViewInit {

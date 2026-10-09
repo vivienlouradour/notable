@@ -1,19 +1,16 @@
-import { AfterViewInit, Component, OnInit } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject } from '@angular/core';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-lang-switcher',
   imports: [TranslatePipe],
   templateUrl: './lang-switcher.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrl: './lang-switcher.component.css'
 })
 export class LangSwitcherComponent {
-
-  protected selectedLang: string;
-
-  constructor(private translate: TranslateService) {
-    this.selectedLang = this.translate.currentLang;
-  }
+  private readonly translate = inject(TranslateService);
+  protected selectedLang = this.translate.currentLang;
 
   switchLang(event: Event) {
     const value = (event.target as HTMLSelectElement).value;

@@ -1,62 +1,52 @@
-import { Component, Input, OnInit } from '@angular/core';
-import { NoteService } from '../../core/note.service';
-import { Note } from '../../shared/models/note.model';
+import { Component, ChangeDetectionStrategy, inject, Signal, computed } from '@angular/core';
+import { NoteService } from '../../data/notes/note.service';
+import { Note } from '../../data/notes/note.model';
 import { FormsModule } from '@angular/forms';
-
-import { combineLatest, map, Observable, of, Subject } from 'rxjs';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { map } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-note',
   imports: [FormsModule],
   templateUrl: './note.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrl: './note.component.css'
 })
-export class NoteComponent implements OnInit {
-  private destroy$ = new Subject<void>();
+export class NoteComponent {
+  private readonly route = inject(ActivatedRoute);
+  private readonly noteService = inject(NoteService);
+  private readonly router = inject(Router);
 
-  @Input() noteId!: string;
-  protected note: Note | undefined;
+  private readonly noteId: Signal<string | null> = toSignal(
+    this.route.paramMap.pipe(
+      map(params => params.get('id'))
+    ),
+    { initialValue: null }
+  );
 
-  public constructor(
-    private noteService: NoteService,
-    private route: ActivatedRoute,
-    private router: Router
-  ) { }
+  protected readonly note: Signal<Note | undefined> = computed(() => {
+    const noteId = this.noteId();
 
-  ngOnInit(): void {
-    if (!this.noteId) {
-      this.noteId = this.route.snapshot.paramMap.get('id') ?? '';
+    if (!noteId) {
+      return undefined;
     }
 
-    const routeId$ = this.route.paramMap.pipe(map(params => params.get('id')));
-    const notes$ = this.noteService.notes$;
-    combineLatest([routeId$, notes$])
-      .pipe(map(([id, notes]) => notes.find(note => note.id === id)))
-      .subscribe(note => {
-        this.note = note;
-      });
-  }
+    return this.noteService.notes().find(note => note.id === noteId);
+  });
 
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
-  }
-
-  updateNote(): Observable<void> {
-    if (this.note) {
-      return this.noteService.updateNote(this.noteId, this.note);
+  async updateNote(): Promise<void> {
+    const note = this.note();
+    if (note) {
+      await this.noteService.updateNote(note, { title: note.title, content: note.content });
     }
-
-    return of();
   }
 
-  deleteNote() {
-    if (this.note) {
-      this.noteService.deleteNote(this.note.id, this.note.rev)
-        .subscribe({
-          complete: () => this.router.navigate(['/notes'])
-        });
+  async deleteNote(): Promise<void> {
+    const note = this.note();
+    if (note) {
+      await this.noteService.deleteNote(note);
+      this.router.navigate(['/notes']);
     }
   }
 }

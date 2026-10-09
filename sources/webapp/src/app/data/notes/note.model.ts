@@ -1,11 +1,8 @@
-export interface NoteBase {
-  title: string;
-  content: string;
-}
-
-export interface Note extends NoteBase {
+export interface Note {
   id: string;
   rev: string;
+  title: string;
+  content: string;
   metadata: NoteMetadata;
 }
 

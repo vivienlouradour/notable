@@ -1,8 +1,7 @@
 
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { NoteService } from '../../core/note.service';
-import { Note } from '../../shared/models/note.model';
-import { Subject, takeUntil } from 'rxjs';
+import { Component, ChangeDetectionStrategy, Signal, inject } from '@angular/core';
+import { NoteService } from '../../data/notes/note.service';
+import { Note } from '../../data/notes/note.model';
 import { NoteQuickCreateComponent } from '../../shared/components/note-quick-create/note-quick-create.component';
 import { NotePreviewComponent } from "../../shared/components/note-preview/note-preview.component";
 
@@ -10,26 +9,11 @@ import { NotePreviewComponent } from "../../shared/components/note-preview/note-
   selector: 'app-notes',
   imports: [NoteQuickCreateComponent, NotePreviewComponent],
   templateUrl: './notes.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrl: './notes.component.css'
 })
-export class NotesComponent implements OnInit, OnDestroy {
-  private destroy$ = new Subject<void>();
-  protected notes: Note[] = [];
+export class NotesComponent {
+  private readonly noteService = inject(NoteService);
 
-  constructor(
-    private noteService: NoteService
-  ) {
-  }
-
-  ngOnInit(): void {
-    this.noteService
-      .notes$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(notes => this.notes = notes);
-  }
-
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
-  }
+  protected notes: Signal<Note[]> = this.noteService.notes;
 }
