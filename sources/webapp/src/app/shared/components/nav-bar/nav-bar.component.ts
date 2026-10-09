@@ -6,8 +6,8 @@ import { RouterLink } from '@angular/router';
   selector: 'app-nav-bar',
   imports: [RouterLink],
   templateUrl: './nav-bar.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  styleUrl: './nav-bar.component.css'
+  styleUrl: './nav-bar.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class NavBarComponent {
   protected appName = environment.appName;

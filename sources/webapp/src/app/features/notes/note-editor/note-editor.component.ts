@@ -1,19 +1,19 @@
 import { Component, ChangeDetectionStrategy, inject, Signal, computed } from '@angular/core';
-import { NoteService } from '../../data/notes/note.service';
-import { Note } from '../../data/notes/note.model';
+import { NoteService } from '../../../data/notes/note.service';
+import { Note } from '../../../data/notes/note.model';
 import { FormsModule } from '@angular/forms';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
-  selector: 'app-note',
+  selector: 'app-note-editor',
   imports: [FormsModule],
-  templateUrl: './note.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  styleUrl: './note.component.css'
+  templateUrl: './note-editor.component.html',
+  styleUrl: './note-editor.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class NoteComponent {
+export class NoteEditorComponent {
   private readonly route = inject(ActivatedRoute);
   private readonly noteService = inject(NoteService);
   private readonly router = inject(Router);

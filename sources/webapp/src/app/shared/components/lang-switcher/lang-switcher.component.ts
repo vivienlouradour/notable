@@ -5,8 +5,8 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
   selector: 'app-lang-switcher',
   imports: [TranslatePipe],
   templateUrl: './lang-switcher.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  styleUrl: './lang-switcher.component.css'
+  styleUrl: './lang-switcher.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class LangSwitcherComponent {
   private readonly translate = inject(TranslateService);

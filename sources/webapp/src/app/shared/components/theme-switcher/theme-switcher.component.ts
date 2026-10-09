@@ -6,8 +6,8 @@ import { themeChange } from 'theme-change';
   selector: 'app-theme-switcher',
   imports: [TranslatePipe],
   templateUrl: './theme-switcher.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  styleUrl: './theme-switcher.component.css'
+  styleUrl: './theme-switcher.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ThemeSwitcherComponent implements AfterViewInit {
   ngAfterViewInit(): void {
