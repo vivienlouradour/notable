@@ -1,5 +1,5 @@
 import { Component, ChangeDetectionStrategy, inject } from '@angular/core';
-import { NoteService } from '../../../../data/notes/note.service';
+import { NoteStore } from '../../../../data/notes/note.store';
 import { FormsModule } from '@angular/forms';
 
 @Component({
@@ -10,13 +10,13 @@ import { FormsModule } from '@angular/forms';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class NoteQuickCreateComponent {
-  private readonly noteService = inject(NoteService);
+  private readonly noteStore = inject(NoteStore);
 
   protected noteContent = '';
   protected noteTitle = '';
 
   async saveNote(): Promise<void> {
     const title = this.noteTitle ?? this.noteContent.slice(0, 10) + "...";
-    await this.noteService.createNote(title, this.noteContent);
+    await this.noteStore.createNote(title, this.noteContent);
   }
 }

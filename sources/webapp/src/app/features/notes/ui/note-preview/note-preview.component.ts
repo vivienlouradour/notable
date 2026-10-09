@@ -1,7 +1,7 @@
-import { Component, Input, ChangeDetectionStrategy, input } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy, input, inject } from '@angular/core';
 import { Note } from '../../../../data/notes/note.model';
 
-import { NoteService } from '../../../../data/notes/note.service';
+import { NoteStore } from '../../../../data/notes/note.store';
 import { RouterLink } from '@angular/router';
 
 @Component({
@@ -12,13 +12,10 @@ import { RouterLink } from '@angular/router';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class NotePreviewComponent {
-  readonly note = input.required<Note>();
-
-  constructor(
-    private noteService: NoteService
-  ) { }
+  private readonly noteStore = inject(NoteStore);
+  protected readonly note = input.required<Note>();
 
   protected delete(): void {
-    this.noteService.deleteNote(this.note());
+    this.noteStore.deleteNote(this.note());
   }
 }

@@ -1,5 +1,5 @@
 import { Component, ChangeDetectionStrategy, inject, Signal, computed } from '@angular/core';
-import { NoteService } from '../../../data/notes/note.service';
+import { NoteStore } from '../../../data/notes/note.store';
 import { Note } from '../../../data/notes/note.model';
 import { FormsModule } from '@angular/forms';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -15,7 +15,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 })
 export class NoteEditorComponent {
   private readonly route = inject(ActivatedRoute);
-  private readonly noteService = inject(NoteService);
+  private readonly noteStore = inject(NoteStore);
   private readonly router = inject(Router);
 
   private readonly noteId: Signal<string | null> = toSignal(
@@ -32,20 +32,20 @@ export class NoteEditorComponent {
       return undefined;
     }
 
-    return this.noteService.notes().find(note => note.id === noteId);
+    return this.noteStore.notes().find(note => note.id === noteId);
   });
 
   async updateNote(): Promise<void> {
     const note = this.note();
     if (note) {
-      await this.noteService.updateNote(note, { title: note.title, content: note.content });
+      await this.noteStore.updateNote(note, { title: note.title, content: note.content });
     }
   }
 
   async deleteNote(): Promise<void> {
     const note = this.note();
     if (note) {
-      await this.noteService.deleteNote(note);
+      await this.noteStore.deleteNote(note);
       this.router.navigate(['/notes']);
     }
   }

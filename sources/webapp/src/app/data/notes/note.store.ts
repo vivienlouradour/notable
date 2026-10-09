@@ -17,7 +17,7 @@ type NoteChanges = Omit<Partial<Note>, 'metadata'> & {
 };
 
 @Injectable({ providedIn: 'root' })
-export class NoteService {
+export class NoteStore {
   private readonly dbService = inject(PouchDbService);
   private readonly noteDocumentIdentifier = "note";
   private readonly _notes = signal<Note[]>([]);

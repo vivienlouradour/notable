@@ -1,6 +1,6 @@
 
 import { Component, ChangeDetectionStrategy, Signal, inject } from '@angular/core';
-import { NoteService } from '../../../data/notes/note.service';
+import { NoteStore } from '../../../data/notes/note.store';
 import { Note } from '../../../data/notes/note.model';
 import { NoteQuickCreateComponent } from '../ui/note-quick-create/note-quick-create.component';
 import { NotePreviewComponent } from "../ui/note-preview/note-preview.component";
@@ -13,7 +13,7 @@ import { NotePreviewComponent } from "../ui/note-preview/note-preview.component"
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class NotesListComponent {
-  private readonly noteService = inject(NoteService);
+  private readonly noteStore = inject(NoteStore);
 
-  protected notes: Signal<Note[]> = this.noteService.notes;
+  protected notes: Signal<Note[]> = this.noteStore.notes;
 }

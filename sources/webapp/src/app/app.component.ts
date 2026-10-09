@@ -5,7 +5,7 @@ import { NavBarComponent } from "./shared/components/nav-bar/nav-bar.component";
 import { TranslateService } from '@ngx-translate/core';
 import { LangSwitcherComponent } from "./shared/components/lang-switcher/lang-switcher.component";
 import { TagMenuItemComponent } from './shared/components/tag-menu-item/tag-menu-item.component';
-import { NoteService } from './data/notes/note.service';
+import { NoteStore } from './data/notes/note.store';
 import { Note } from './data/notes/note.model';
 
 @Component({
@@ -17,16 +17,16 @@ import { Note } from './data/notes/note.model';
 })
 export class AppComponent {
   title = 'notable';
-  private readonly noteService = inject(NoteService);
+  private readonly noteStore = inject(NoteStore);
+  private readonly translate = inject(TranslateService);
 
-  protected notes: Signal<Note[]> = this.noteService.notes;
+  protected notes: Signal<Note[]> = this.noteStore.notes;
   protected tags: Signal<string[]> = computed(() =>
     [
       ...new Set(this.notes().flatMap(note => note.metadata?.tags ?? []))
     ]);
 
-  constructor(
-    private translate: TranslateService) {
+  constructor() {
     this.translate.addLangs(['fr', 'en']);
     this.translate.setDefaultLang('en');
     this.translate.use('en');
