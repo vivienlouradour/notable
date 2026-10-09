@@ -1,6 +1,8 @@
 import PouchDB from 'pouchdb-browser';
 import { environment } from '../../../../environments/environment';
 import { Injectable } from "@angular/core";
+import { BaseDocument, DocumentChange } from './pouchdb.model';
+import { Observable } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class PouchDbService {
@@ -11,11 +13,11 @@ export class PouchDbService {
     this.sync();
   }
 
-  get<T>(id: string): Promise<T & PouchDB.Core.GetMeta> {
+  get<T extends BaseDocument>(id: string): Promise<T> {
     return this.db.get<T>(id);
   }
 
-  gets<T>(): Promise<T[]> {
+  gets<T extends BaseDocument>(): Promise<T[]> {
     return this.db.allDocs({ include_docs: true })
       .then(response =>
         response.rows
@@ -23,19 +25,43 @@ export class PouchDbService {
           .map(r => r.doc! as T));
   }
 
-  put<T>(doc: T & PouchDB.Core.IdMeta): Promise<PouchDB.Core.Response> {
+  put<T extends BaseDocument>(doc: T): Promise<PouchDB.Core.Response> {
     return this.db.put(doc);
   }
 
-  remove<T>(doc: T & PouchDB.Core.IdMeta & PouchDB.Core.GetMeta): Promise<PouchDB.Core.Response> {
+  remove<T extends BaseDocument>(doc: T): Promise<PouchDB.Core.Response> {
     return this.db.remove(doc);
   }
 
-  changes<T>() {
-    return this.db.changes<T>({
-      since: 'now',
-      live: true,
-      include_docs: true
+  changes<T extends BaseDocument>(documentTypeIdentifierFilter?: string): Observable<DocumentChange<T>> {
+    return new Observable(subscriber => {
+      const changes = this.db.changes<T>({
+        since: 'now',
+        live: true,
+        include_docs: true
+      });
+
+      changes.on('change', change => {
+        if (documentTypeIdentifierFilter && !change.id.startsWith(documentTypeIdentifierFilter)) {
+          return;
+        }
+
+        const result: DocumentChange<T> = {
+          id: change.id,
+          deleted: change.deleted === true,
+          doc: change.doc
+        };
+
+        subscriber.next(result);
+      });
+
+      changes.on('error', error => {
+        subscriber.error(error);
+      });
+
+      return () => {
+        changes.cancel();
+      };
     });
   }
 

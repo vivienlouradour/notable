@@ -1,12 +1,20 @@
 import { inject, Injectable, signal } from "@angular/core";
-import { Note } from "./note.model";
+import { Note, NoteMetadata } from "./note.model";
 import { PouchDbService } from "../../core/persistence/pouchdb/pouchdb.service";
+import { BaseDocument } from "../../core/persistence/pouchdb/pouchdb.model";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 
-interface NoteDocument extends Omit<Note, 'id' | 'rev' | 'metadata'>, PouchDB.Core.IdMeta, PouchDB.Core.GetMeta {
+interface NoteDocument extends Omit<Note, 'id' | 'rev' | 'metadata'>, BaseDocument, PouchDB.Core.IdMeta, PouchDB.Core.GetMeta {
   createdAt: string;
   updatedAt?: string;
+  deleted: boolean;
+  deletedAt?: string;
   tags: string[];
 }
+
+type NoteChanges = Omit<Partial<Note>, 'metadata'> & {
+  metadata?: Partial<NoteMetadata>;
+};
 
 @Injectable({ providedIn: 'root' })
 export class NoteService {
@@ -17,11 +25,33 @@ export class NoteService {
   public readonly notes = this._notes.asReadonly();
 
   constructor() {
-    this.initialize();
+    // Load initial list of notes
+    this.loadNotes();
+
+    // Listen to changes
+    this.dbService.changes<NoteDocument>(this.noteDocumentIdentifier)
+      .pipe(takeUntilDestroyed())
+      .subscribe(change => {
+        this._notes.update(current => {
+          if (change.deleted || !change.doc || change.doc.deleted) {
+            return current.filter(note => note.id !== change.id);
+          }
+
+          const note = this.toNote(change.doc);
+          const index = current.findIndex(n => n.id === note.id);
+
+          if (index >= 0) {
+            return current.map((n, i) => i === index ? note : n);
+          }
+
+          return [...current, note];
+        });
+      })
   }
 
   public async get(id: string): Promise<Note> {
     const noteDocument = await this.dbService.get<NoteDocument>(id);
+
     return this.toNote(noteDocument);
   }
 
@@ -35,32 +65,33 @@ export class NoteService {
     return resp.id;
   }
 
-  public async updateNote(note: Note, changes: Partial<Note>): Promise<Note> {
-    const updated = {
+  public async updateNote(note: Note, changes: NoteChanges): Promise<Note> {
+    const updatedNote = {
       ...note,
-      ...changes
+      ...changes,
+      metadata: {
+        ...note.metadata,
+        ...changes.metadata
+      }
     };
 
-    const noteDocument = this.toDocument(updated);
+    const noteDocument = this.toDocument(updatedNote);
     await this.dbService.put(noteDocument);
 
-    return updated;
+    return updatedNote;
   }
 
   public async deleteNote(note: Note): Promise<void> {
-    await this.dbService.remove({ _id: note.id, _rev: note.rev });
-  }
+    const noteDocument = this.toDocument(note);
+    noteDocument.deleted = true;
+    noteDocument.deletedAt = new Date().toISOString();
 
-  private async initialize(): Promise<void> {
-    await this.loadNotes();
-    this.listenToChanges();
+    await this.dbService.put(noteDocument);
   }
 
   private async loadNotes(): Promise<void> {
-    var notes = await this.dbService
-      .gets<NoteDocument>()
-      .then(documents => documents.map(this.toNote));
-
+    const noteDocuments = await this.dbService.gets<NoteDocument>();
+    const notes = noteDocuments.filter(note => !note.deleted).map(this.toNote);
     this._notes.set(notes);
   }
 
@@ -72,30 +103,6 @@ export class NoteService {
     const tagRegex = new RegExp('#(\\w|-|_)+', 'g');
     const tags = [...content.matchAll(tagRegex)];
     return tags.map(tag => tag[0]);
-  }
-
-  private listenToChanges(): void {
-    this.dbService.changes<NoteDocument>().on('change', change => {
-      // Change should concern Note type document
-      if (!change.id.startsWith(this.noteDocumentIdentifier)) {
-        return;
-      }
-
-      this._notes.update(current => {
-        if (change.deleted) {
-          return current.filter(note => note.id !== change.id);
-        }
-
-        const note = this.toNote(change.doc as NoteDocument);
-        const index = current.findIndex(n => n.id === note.id);
-
-        if (index >= 0) {
-          return current.map((n, i) => i === index ? note : n);
-        }
-
-        return [...current, note];
-      });
-    });
   }
 
   private toNote(document: NoteDocument): Note {
@@ -120,6 +127,7 @@ export class NoteService {
       content: note.content,
       createdAt: note.metadata.createdAt.toISOString(),
       updatedAt: new Date().toISOString(),
+      deleted: false,
       tags: this.parseTags(note.content),
     };
   }

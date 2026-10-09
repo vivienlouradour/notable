@@ -1,6 +1,6 @@
-export interface Note {
-  id: string;
-  rev: string;
+import { NotableModel } from "../model";
+
+export interface Note extends NotableModel {
   title: string;
   content: string;
   metadata: NoteMetadata;
