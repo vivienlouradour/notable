@@ -1,5 +1,11 @@
-<select class="select" (change)="this.switchLang($event)">
-  <option disabled selected>{{ 'shared.language.choose' | translate }}</option>
-  <option [selected]="this.selectedLang == 'en'" value="en">{{ 'shared.language.en' | translate }}</option>
-  <option [selected]="this.selectedLang == 'fr'" value="fr">{{ 'shared.language.fr' | translate }}</option>
+<select
+  class="select select-sm w-full border-base-300 bg-base-200 text-xs"
+  (change)="switchLang($event)"
+  [attr.aria-label]="'workspace.language' | translate">
+  <option [selected]="selectedLang === 'en'" value="en">
+    {{ 'shared.language.en' | translate }}
+  </option>
+  <option [selected]="selectedLang === 'fr'" value="fr">
+    {{ 'shared.language.fr' | translate }}
+  </option>
 </select>

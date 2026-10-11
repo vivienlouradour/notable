@@ -3,6 +3,7 @@ import { NotesListComponent } from './features/notes/notes-list/notes-list.compo
 import { NoteEditorComponent } from './features/notes/note-editor/note-editor.component';
 
 export const routes: Routes = [
+  { path: '', pathMatch: 'full', redirectTo: 'notes' },
   { path: 'notes', component: NotesListComponent },
-  { path: 'notes/:id', component: NoteEditorComponent }
+  { path: 'notes/:id', component: NoteEditorComponent },
 ];

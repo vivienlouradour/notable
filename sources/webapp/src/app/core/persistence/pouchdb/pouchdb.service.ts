@@ -1,6 +1,6 @@
 import PouchDB from 'pouchdb-browser';
 import { environment } from '../../../../environments/environment';
-import { Injectable } from "@angular/core";
+import { Injectable } from '@angular/core';
 import { BaseDocument, DocumentChange } from './pouchdb.model';
 import { Observable } from 'rxjs';
 
@@ -13,11 +13,11 @@ export class PouchDbService {
   }
 
   gets<T extends BaseDocument>(): Promise<T[]> {
-    return this.db.allDocs({ include_docs: true })
+    return this.db
+      .allDocs({ include_docs: true })
       .then(response =>
-        response.rows
-          .filter(row => row.doc)
-          .map(r => r.doc! as T));
+        response.rows.filter(row => row.doc).map(r => r.doc! as T)
+      );
   }
 
   put<T extends BaseDocument>(doc: T): Promise<PouchDB.Core.Response> {
@@ -28,23 +28,28 @@ export class PouchDbService {
     return this.db.remove(doc);
   }
 
-  changes<T extends BaseDocument>(documentTypeIdentifierFilter?: string): Observable<DocumentChange<T>> {
+  changes<T extends BaseDocument>(
+    documentTypeIdentifierFilter?: string
+  ): Observable<DocumentChange<T>> {
     return new Observable(subscriber => {
       const changes = this.db.changes<T>({
         since: 'now',
         live: true,
-        include_docs: true
+        include_docs: true,
       });
 
       changes.on('change', change => {
-        if (documentTypeIdentifierFilter && !change.id.startsWith(documentTypeIdentifierFilter)) {
+        if (
+          documentTypeIdentifierFilter &&
+          !change.id.startsWith(documentTypeIdentifierFilter)
+        ) {
           return;
         }
 
         const result: DocumentChange<T> = {
           id: change.id,
           deleted: change.deleted === true,
-          doc: change.doc
+          doc: change.doc,
         };
 
         subscriber.next(result);
@@ -61,13 +66,16 @@ export class PouchDbService {
   }
 
   public syncWith(remoteDb: PouchDB.Database) {
-    return this.db.sync(remoteDb, {
-      live: true,
-      retry: true
-    }).on('change', info => {
-      console.log('Sync change:', info);
-    }).on('error', err => {
-      console.error('Sync error:', err);
-    });
+    return this.db
+      .sync(remoteDb, {
+        live: true,
+        retry: true,
+      })
+      .on('change', info => {
+        console.log('Sync change:', info);
+      })
+      .on('error', err => {
+        console.error('Sync error:', err);
+      });
   }
 }

@@ -1,11 +1,69 @@
-<app-note-quick-create />
-
-<h1 class="text-3xl font-bold">
-  Existing notes
-</h1>
-
-<ul class="list-disc">
-  @for (note of notes(); track note) {
-  <app-note-preview [note]="note" />
-  }
-</ul>
+<div
+  class="flex h-12 items-center justify-between gap-3 border-b border-base-300 px-4 content:px-6">
+  <div
+    class="breadcrumbs min-w-0 overflow-hidden py-0 text-xs text-base-content/75">
+    <ul>
+      <li class="gap-2">
+        <app-icon name="notebook" />{{ 'workspace.myNotebook' | translate }}
+      </li>
+      <li class="text-base-content">{{ 'workspace.allNotes' | translate }}</li>
+    </ul>
+  </div>
+  <span class="shrink-0 text-xs text-base-content/75"
+    >{{ notes().length }} {{ 'workspace.documentsCount' | translate }}</span
+  >
+</div>
+<div
+  class="mx-auto w-full max-w-5xl px-6 py-8 content:p-9 wide:px-8 wide:pt-12">
+  <div
+    class="mb-7 grid size-14 place-items-center rounded-box bg-primary/10 text-primary">
+    <app-icon name="notebook" class="size-8" />
+  </div>
+  <h1 class="mb-2 text-3xl font-semibold tracking-tight content:text-4xl">
+    {{ 'workspace.allNotes' | translate }}
+  </h1>
+  <p class="text-sm leading-relaxed text-base-content/75">
+    {{ 'notes.description' | translate }}
+  </p>
+  <section class="mt-9" id="new-note">
+    <div class="mb-3 flex items-center gap-2">
+      <app-icon name="plus" class="text-base-content/75" />
+      <h2 class="text-sm font-semibold">{{ 'notes.new' | translate }}</h2>
+    </div>
+    <app-note-quick-create />
+  </section>
+  <section class="mt-9">
+    <div class="mb-3 flex items-center gap-2">
+      <app-icon name="document" class="text-base-content/75" />
+      <h2 class="text-sm font-semibold">{{ 'notes.library' | translate }}</h2>
+      <span class="badge badge-ghost badge-xs">{{ notes().length }}</span>
+    </div>
+    <div class="border-t border-base-300">
+      <div class="flex justify-between px-4 py-3 text-xs text-base-content/75">
+        <span>{{ 'notes.name' | translate }}</span>
+        <span class="hidden pr-10 content:inline">{{
+          'notes.created' | translate
+        }}</span>
+      </div>
+      <ul class="list">
+        @for (note of notes(); track note.id) {
+          <li><app-note-preview [note]="note" /></li>
+        } @empty {
+          <li class="px-5 py-8 text-center">
+            <app-icon name="notebook" class="mb-3 size-8 text-primary" />
+            <h3 class="text-sm font-medium">{{ 'notes.empty' | translate }}</h3>
+            <p class="mt-2 text-xs text-base-content/75">
+              {{ 'notes.emptyHint' | translate }}
+            </p>
+          </li>
+        }
+      </ul>
+    </div>
+  </section>
+  <p
+    class="mt-8 flex items-center justify-center gap-2 text-xs text-base-content/75">
+    <app-icon name="check" class="text-success" />{{
+      'notes.localHint' | translate
+    }}
+  </p>
+</div>

@@ -1,5 +1,30 @@
-<div className="grid w-full gap-2">
-  <input type="text" [(ngModel)]="noteTitle" placeholder="Title..." class="input" />
-  <textarea class="textarea" [(ngModel)]="noteContent" placeholder="Note content..."></textarea>
-  <button class="btn" (click)="saveNote()">Add note</button>
-</div>
+<form
+  class="card card-sm card-border overflow-hidden border-base-300 bg-base-100 focus-within:border-primary"
+  (ngSubmit)="saveNote()">
+  <div class="card-body">
+    <input
+      class="input input-ghost w-full font-medium placeholder:text-base-content/70 focus-visible:outline-primary"
+      id="new-note-title"
+      type="text"
+      name="title"
+      [(ngModel)]="noteTitle"
+      [placeholder]="'notes.titlePlaceholder' | translate"
+      [attr.aria-label]="'notes.name' | translate" />
+    <textarea
+      class="textarea textarea-ghost w-full resize-y text-sm leading-relaxed placeholder:text-base-content/70 focus-visible:outline-primary"
+      name="content"
+      [(ngModel)]="noteContent"
+      [placeholder]="'notes.contentPlaceholder' | translate"
+      [attr.aria-label]="'notes.content' | translate"
+      rows="3"></textarea>
+  </div>
+  <div
+    class="card-actions items-center justify-end border-t border-base-300 bg-base-200 px-4 py-3 content:justify-between">
+    <span class="hidden text-xs text-base-content/75 content:inline">{{
+      'notes.captureHint' | translate
+    }}</span>
+    <button class="btn btn-primary btn-sm" type="submit">
+      <app-icon name="plus" />{{ 'notes.add' | translate }}
+    </button>
+  </div>
+</form>

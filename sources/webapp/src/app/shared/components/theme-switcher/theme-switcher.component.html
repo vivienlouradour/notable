@@ -1,4 +1,7 @@
-<select class="select select-bordered w-full max-w-xs" data-choose-theme>
+<select
+  class="select select-sm w-full border-base-300 bg-base-200 text-xs"
+  data-choose-theme
+  [attr.aria-label]="'workspace.appearance' | translate">
   <option value="light">{{ 'shared.theme.light' | translate }}</option>
   <option value="dark">{{ 'shared.theme.dark' | translate }}</option>
   <option value="cupcake">Cupcake</option>

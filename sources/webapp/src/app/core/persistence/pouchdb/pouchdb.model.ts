@@ -10,12 +10,7 @@ export interface DocumentChange<T extends BaseDocument> {
 }
 
 export type SyncStatus =
-  | 'stopped'
-  | 'syncing'
-  | 'idle'
-  | 'offline'
-  | 'error'
-  | 'unauthorized';
+  'stopped' | 'syncing' | 'idle' | 'offline' | 'error' | 'unauthorized';
 
 export interface SyncState {
   status: SyncStatus;

@@ -1,13 +1,15 @@
 import { Component, ChangeDetectionStrategy, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NoteStore } from '../../../../data/notes/note.store';
+import { TranslatePipe } from '@ngx-translate/core';
+import { IconComponent } from '../../../../shared/components/icon/icon.component';
 
 @Component({
   selector: 'app-note-quick-create',
-  imports: [FormsModule],
+  imports: [FormsModule, TranslatePipe, IconComponent],
   templateUrl: './note-quick-create.component.html',
-  styleUrl: './note-quick-create.component.css',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  host: { class: 'block' },
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NoteQuickCreateComponent {
   private readonly noteStore = inject(NoteStore);
@@ -16,7 +18,7 @@ export class NoteQuickCreateComponent {
   protected noteTitle = '';
 
   async saveNote(): Promise<void> {
-    const title = this.noteTitle ?? this.noteContent.slice(0, 10) + "...";
+    const title = this.noteTitle ?? this.noteContent.slice(0, 10) + '...';
     await this.noteStore.createNote(title, this.noteContent);
   }
 }

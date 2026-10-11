@@ -1,4 +1,4 @@
-import { NotableModel } from "../model";
+import { NotableModel } from '../model';
 
 export interface Note extends NotableModel {
   title: string;

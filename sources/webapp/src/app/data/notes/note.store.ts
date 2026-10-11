@@ -1,10 +1,15 @@
-import { inject, Injectable, signal } from "@angular/core";
-import { Note, NoteMetadata } from "./note.model";
-import { PouchDbService } from "../../core/persistence/pouchdb/pouchdb.service";
-import { BaseDocument } from "../../core/persistence/pouchdb/pouchdb.model";
-import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
+import { inject, Injectable, signal } from '@angular/core';
+import { Note, NoteMetadata } from './note.model';
+import { PouchDbService } from '../../core/persistence/pouchdb/pouchdb.service';
+import { BaseDocument } from '../../core/persistence/pouchdb/pouchdb.model';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
-interface NoteDocument extends Omit<Note, 'id' | 'rev' | 'metadata'>, BaseDocument, PouchDB.Core.IdMeta, PouchDB.Core.GetMeta {
+interface NoteDocument
+  extends
+    Omit<Note, 'id' | 'rev' | 'metadata'>,
+    BaseDocument,
+    PouchDB.Core.IdMeta,
+    PouchDB.Core.GetMeta {
   createdAt: string;
   updatedAt?: string;
   deleted: boolean;
@@ -19,7 +24,7 @@ type NoteChanges = Omit<Partial<Note>, 'metadata'> & {
 @Injectable({ providedIn: 'root' })
 export class NoteStore {
   private readonly dbService = inject(PouchDbService);
-  private readonly noteDocumentIdentifier = "note";
+  private readonly noteDocumentIdentifier = 'note';
   private readonly _notes = signal<Note[]>([]);
 
   public readonly notes = this._notes.asReadonly();
@@ -29,7 +34,8 @@ export class NoteStore {
     this.loadNotes();
 
     // Listen to changes
-    this.dbService.changes<NoteDocument>(this.noteDocumentIdentifier)
+    this.dbService
+      .changes<NoteDocument>(this.noteDocumentIdentifier)
       .pipe(takeUntilDestroyed())
       .subscribe(change => {
         this._notes.update(current => {
@@ -41,12 +47,12 @@ export class NoteStore {
           const index = current.findIndex(n => n.id === note.id);
 
           if (index >= 0) {
-            return current.map((n, i) => i === index ? note : n);
+            return current.map((n, i) => (i === index ? note : n));
           }
 
           return [...current, note];
         });
-      })
+      });
   }
 
   public async get(id: string): Promise<Note> {
@@ -59,7 +65,13 @@ export class NoteStore {
     const date = new Date().toISOString();
     const id = `${this.noteDocumentIdentifier}:${date}`;
     const tags = this.parseTags(content);
-    const note = { title, content, _id: id, createdAt: date, tags } as NoteDocument;
+    const note = {
+      title,
+      content,
+      _id: id,
+      createdAt: date,
+      tags,
+    } as NoteDocument;
 
     const resp = await this.dbService.put(note);
     return resp.id;
@@ -71,8 +83,8 @@ export class NoteStore {
       ...changes,
       metadata: {
         ...note.metadata,
-        ...changes.metadata
-      }
+        ...changes.metadata,
+      },
     };
 
     const noteDocument = this.toDocument(updatedNote);
@@ -113,9 +125,11 @@ export class NoteStore {
       content: document.content,
       metadata: {
         createdAt: new Date(document.createdAt),
-        updatedAt: document.updatedAt ? new Date(document.updatedAt) : undefined,
-        tags: document.tags
-      }
+        updatedAt: document.updatedAt
+          ? new Date(document.updatedAt)
+          : undefined,
+        tags: document.tags,
+      },
     };
   }
 

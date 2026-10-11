@@ -65,8 +65,6 @@ export class SyncService {
   }
 
   private errorMessage(error: unknown): string {
-    return error instanceof Error
-      ? error.message
-      : 'Erreur de synchronisation';
+    return error instanceof Error ? error.message : 'Erreur de synchronisation';
   }
 }
