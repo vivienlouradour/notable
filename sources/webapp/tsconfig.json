@@ -7,6 +7,7 @@
     "strict": true,
     "strictNullChecks": true,
     "strictPropertyInitialization": true,
+    "noUncheckedIndexedAccess": true,
     "noImplicitAny": true,
     "noImplicitThis": true,
     "noImplicitOverride": true,
