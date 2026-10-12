@@ -31,6 +31,14 @@
     "appearance": "Appearance",
     "language": "Language",
     "localStorage": "Local storage",
+    "connection": {
+      "offline": "Server offline · Sync unavailable",
+      "serverOnly": "Server connected · Sync unavailable",
+      "syncing": "Server connected · Syncing",
+      "synced": "Server connected · Synced",
+      "connectedAlert": "Connected to the server.",
+      "disconnectedAlert": "Disconnected from the server. Your notes remain available offline."
+    },
     "documentsCount": "documents"
   },
   "notes": {

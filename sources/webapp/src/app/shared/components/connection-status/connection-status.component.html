@@ -1,0 +1,35 @@
+<span class="flex min-w-0 items-center gap-1.5" role="status">
+  <span
+    class="status shrink-0"
+    [class.status-success]="status().color === 'success'"
+    [class.status-warning]="status().color === 'warning'"
+    [class.status-error]="status().color === 'error'"
+    aria-hidden="true"></span>
+  <span class="truncate">{{ status().label | translate }}</span>
+</span>
+
+@if (connectionAlert() !== null) {
+  <div class="toast toast-start bottom-9 z-50 max-w-[calc(100vw-1.5rem)]">
+    <div
+      class="alert flex gap-3 text-sm shadow-lg"
+      [class.alert-success]="connectionAlert()"
+      [class.alert-error]="!connectionAlert()"
+      [attr.role]="connectionAlert() ? 'status' : 'alert'">
+      <span>
+        {{
+          (connectionAlert()
+            ? 'workspace.connection.connectedAlert'
+            : 'workspace.connection.disconnectedAlert'
+          ) | translate
+        }}
+      </span>
+      <button
+        type="button"
+        class="btn btn-ghost btn-xs btn-square shrink-0"
+        [attr.aria-label]="'workspace.close' | translate"
+        (click)="dismissAlert()">
+        <app-icon name="close" />
+      </button>
+    </div>
+  </div>
+}

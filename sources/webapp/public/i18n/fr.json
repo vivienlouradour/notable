@@ -31,6 +31,14 @@
     "appearance": "Apparence",
     "language": "Langue",
     "localStorage": "Stockage local",
+    "connection": {
+      "offline": "Serveur déconnecté · Sync indisponible",
+      "serverOnly": "Serveur connecté · Sync indisponible",
+      "syncing": "Serveur connecté · Synchronisation en cours",
+      "synced": "Serveur connecté · Synchronisé",
+      "connectedAlert": "Connexion au serveur établie.",
+      "disconnectedAlert": "Connexion au serveur perdue. Vos notes restent disponibles hors ligne."
+    },
     "documentsCount": "documents"
   },
   "notes": {
