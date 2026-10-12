@@ -3,7 +3,6 @@ import { RouterOutlet } from '@angular/router';
 import { NavBarComponent } from './shared/layout/nav-bar/nav-bar.component';
 import { FooterComponent } from './shared/layout/footer/footer.component';
 import { TranslateService } from '@ngx-translate/core';
-import { SyncService } from './core/server/pouchdb/sync.service';
 
 @Component({
   selector: 'app-root',
@@ -15,13 +14,10 @@ import { SyncService } from './core/server/pouchdb/sync.service';
 export class AppComponent {
   title = 'notable';
   private readonly translate = inject(TranslateService);
-  private readonly syncService = inject(SyncService);
 
   constructor() {
     this.translate.addLangs(['fr', 'en']);
     this.translate.setDefaultLang('en');
     this.translate.use('en');
-
-    this.syncService.start();
   }
 }

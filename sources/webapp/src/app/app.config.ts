@@ -1,4 +1,9 @@
-import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
+import {
+  ApplicationConfig,
+  inject,
+  provideAppInitializer,
+  provideZoneChangeDetection,
+} from '@angular/core';
 import { provideRouter, withInMemoryScrolling } from '@angular/router';
 import { provideTranslateService, TranslateLoader } from '@ngx-translate/core';
 import { routes } from './app.routes';
@@ -6,6 +11,7 @@ import { HttpClient, provideHttpClient, withXhr } from '@angular/common/http';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { API_BASE_URL } from './core/server/api/generated/api-client';
 import { environment } from '../environments/environment';
+import { SyncCoordinatorService } from './core/server/pouchdb/sync-coordinator.service';
 
 const httpLoaderFactory: (http: HttpClient) => TranslateHttpLoader = (
   http: HttpClient
@@ -30,6 +36,9 @@ export const appConfig: ApplicationConfig = {
         deps: [HttpClient],
       },
       defaultLanguage: 'en',
+    }),
+    provideAppInitializer(() => {
+      inject(SyncCoordinatorService);
     }),
   ],
 };

@@ -36,10 +36,10 @@ export class SyncService {
       this.onSyncEvent('error', 'error', error)
     );
     sync.on('change', (error?: unknown) =>
-      this.logger.debug("Sync event handled silently : 'sync.on.change'", error)
+      this.logger.info("Sync event handled silently : 'sync.on.change'", error)
     );
     sync.on('complete', (error?: unknown) =>
-      this.logger.debug(
+      this.logger.info(
         "Sync event handled silently : 'sync.on.complete'",
         error
       )
@@ -82,7 +82,7 @@ export class SyncService {
     syncError?: unknown
   ): void {
     const message = `Sync state changed to: '${newSyncState.status}' (event: '${event}'). `;
-    this.logger.debug(message, ...(syncError != null ? [syncError] : []));
+    this.logger.info(message, ...(syncError != null ? [syncError] : []));
   }
 
   private errorMessage(error?: unknown | undefined): string | undefined {

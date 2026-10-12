@@ -68,8 +68,7 @@ export class PouchDbService {
   public syncWith(remoteDb: PouchDB.Database) {
     return this.db.sync(remoteDb, {
       live: true,
-      // retry: true,
-      retry: false,
+      retry: true,
     });
   }
 }
