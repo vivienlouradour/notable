@@ -114,7 +114,7 @@ export class NoteStore {
 
     const tagRegex = new RegExp('#(\\w|-|_)+', 'g');
     const tags = [...content.matchAll(tagRegex)];
-    return tags.map(tag => tag[0]);
+    return [...new Set(tags.map(tag => tag[0]))];
   }
 
   private toNote(document: NoteDocument): Note {

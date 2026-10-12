@@ -1,13 +1,14 @@
 import { inject, Injectable, signal } from '@angular/core';
-import PouchDB from 'pouchdb-browser';
 import { environment } from '../../../../environments/environment';
 import { PouchDbService } from './pouchdb.service';
 import { SyncState } from './pouchdb.model';
 import { LoggerService } from '../../logger/logger.service';
+import { POUCHDB_FACTORY } from './pouchdb.factory';
 
 @Injectable({ providedIn: 'root' })
 export class SyncService {
   private readonly couchDbUrl = environment.couchDbUrl;
+  private readonly createDatabase = inject(POUCHDB_FACTORY);
   private readonly pouchDbService = inject(PouchDbService);
   private readonly logger = inject(LoggerService).withContext('SyncService');
 
@@ -21,7 +22,7 @@ export class SyncService {
       return;
     }
 
-    const remoteDb = new PouchDB(this.couchDbUrl);
+    const remoteDb = this.createDatabase(this.couchDbUrl);
     const sync = this.pouchDbService.syncWith(remoteDb);
     this.syncHandler = sync;
 

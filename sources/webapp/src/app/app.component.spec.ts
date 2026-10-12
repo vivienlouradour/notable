@@ -1,29 +1,38 @@
-import { TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { TranslateService } from '@ngx-translate/core';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { AppComponent } from './app.component';
 
 describe('AppComponent', () => {
+  let fixture: ComponentFixture<AppComponent>;
+
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [AppComponent],
     }).compileComponents();
   });
 
-  it('should create the app', () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.componentInstance;
-    expect(app).toBeTruthy();
+  it('registers French and English and initializes the application in English', () => {
+    const translate = TestBed.inject(TranslateService);
+    const addLangs = vi.spyOn(translate, 'addLangs');
+    const setDefaultLang = vi.spyOn(translate, 'setDefaultLang');
+    const use = vi.spyOn(translate, 'use');
+    fixture = TestBed.createComponent(AppComponent);
+    expect(addLangs).toHaveBeenCalledWith(['fr', 'en']);
+    expect(setDefaultLang).toHaveBeenCalledWith('en');
+    expect(use).toHaveBeenCalledWith('en');
   });
 
-  it(`should have the 'notable' title`, () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.componentInstance;
-    expect(app.title).toEqual('notable');
-  });
-
-  it('should render title', () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    fixture.detectChanges();
-    const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('Hello, notable');
+  it('renders the workspace, routed content container and footer without a backend', async () => {
+    fixture = TestBed.createComponent(AppComponent);
+    fixture.autoDetectChanges();
+    await fixture.whenStable();
+    const root: HTMLElement = fixture.nativeElement;
+    expect(root.querySelector('app-nav-bar')?.textContent).toContain('Notable');
+    expect(root.querySelector('aside')).not.toBeNull();
+    expect(root.querySelector('main router-outlet')).not.toBeNull();
+    expect(
+      root.querySelector('app-footer app-connection-status .status-error')
+    ).not.toBeNull();
   });
 });

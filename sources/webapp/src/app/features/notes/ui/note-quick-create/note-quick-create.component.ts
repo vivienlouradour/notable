@@ -18,7 +18,8 @@ export class NoteQuickCreateComponent {
   protected noteTitle = '';
 
   async saveNote(): Promise<void> {
-    const title = this.noteTitle ?? this.noteContent.slice(0, 10) + '...';
-    await this.noteStore.createNote(title, this.noteContent);
+    await this.noteStore.createNote(this.noteTitle, this.noteContent);
+    this.noteTitle = '';
+    this.noteContent = '';
   }
 }

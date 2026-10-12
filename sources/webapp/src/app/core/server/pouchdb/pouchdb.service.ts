@@ -1,12 +1,12 @@
-import PouchDB from 'pouchdb-browser';
 import { environment } from '../../../../environments/environment';
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { BaseDocument, DocumentChange } from './pouchdb.model';
 import { Observable } from 'rxjs';
+import { POUCHDB_FACTORY } from './pouchdb.factory';
 
 @Injectable({ providedIn: 'root' })
 export class PouchDbService {
-  private readonly db = new PouchDB(environment.localDbName);
+  private readonly db = inject(POUCHDB_FACTORY)(environment.localDbName);
 
   get<T extends BaseDocument>(id: string): Promise<T> {
     return this.db.get<T>(id);
