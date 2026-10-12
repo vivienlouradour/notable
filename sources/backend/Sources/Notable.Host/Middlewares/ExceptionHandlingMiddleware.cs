@@ -16,6 +16,11 @@ namespace Notable.Host.Middlewares
             {
                 await next(context);
             }
+            catch (OperationCanceledException)
+                when (context.RequestAborted.IsCancellationRequested)
+            {
+                this.logger.LogDebug("HTTP request cancelled by client.");
+            }
             catch (Exception ex)
             {
                 await HandleExceptionAsync(context, ex);
@@ -25,7 +30,6 @@ namespace Notable.Host.Middlewares
         private async Task HandleExceptionAsync(HttpContext context, Exception exception)
         {
             this.logger.LogError(exception, "An unhandled exception has been intercepted.");
-
             var errorResponse = GetErrorResponseFromException(exception);
 
             context.Response.StatusCode = errorResponse.StatusCode;
