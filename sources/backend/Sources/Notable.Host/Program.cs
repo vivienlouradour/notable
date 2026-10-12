@@ -1,9 +1,8 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-
+using Notable.Core.Status;
 using Notable.CouchDb;
 using Notable.Host.Middlewares;
-
 using System.Text;
 
 namespace Notable.Host
@@ -52,7 +51,7 @@ namespace Notable.Host
 
             builder.Services.AddCouchDb();
             builder.Services.ConfigureNotableAuth(builder.Configuration);
-
+            
             var app = builder.Build();
 
             app.UseMiddleware<ExceptionHandlingMiddleware>();
@@ -75,7 +74,9 @@ namespace Notable.Host
             app.UseCors("AllowAngular");
 
             app.MapControllers();
+            app.MapCouchDbEndpoints();
 
+            app.MapStatusEndpoints();
             app.Run();
         }
     }

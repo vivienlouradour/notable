@@ -3,17 +3,20 @@ import PouchDB from 'pouchdb-browser';
 import { environment } from '../../../../environments/environment';
 import { PouchDbService } from './pouchdb.service';
 import { SyncState } from './pouchdb.model';
+import { LoggerService } from '../../logger/logger.service';
 
 @Injectable({ providedIn: 'root' })
 export class SyncService {
   private readonly couchDbUrl = environment.couchDbUrl;
   private readonly pouchDbService = inject(PouchDbService);
+  private readonly logger = inject(LoggerService).withContext('SyncService');
+
   private syncHandler?: { cancel: () => void };
 
   private readonly _state = signal<SyncState>({ status: 'stopped' });
   public readonly state = this._state.asReadonly();
 
-  start(): void {
+  public start(): void {
     if (this.syncHandler) {
       return;
     }
@@ -22,49 +25,67 @@ export class SyncService {
     const sync = this.pouchDbService.syncWith(remoteDb);
     this.syncHandler = sync;
 
-    sync.on('active', () => {
-      this.setState({ status: 'syncing' });
-    });
-
-    sync.on('paused', (error?: unknown) => {
-      if (error) {
-        this.setState({
-          status: 'offline',
-          error: this.errorMessage(error),
-        });
-      } else {
-        this.setState({ status: 'idle' });
-      }
-    });
-
-    sync.on('denied', (error: unknown) => {
-      this.setState({
-        status: 'error',
-        error: this.errorMessage(error),
-      });
-    });
-
-    sync.on('error', (error: unknown) => {
-      this.setState({
-        status: 'error',
-        error: this.errorMessage(error),
-      });
-    });
+    sync.on('active', () => this.onSyncEvent('active', 'syncing'));
+    sync.on('paused', (error?: unknown) =>
+      this.onSyncEvent('paused', error ? 'offline' : 'idle', error)
+    );
+    sync.on('denied', (error: unknown) =>
+      this.onSyncEvent('denied', 'error', error)
+    );
+    sync.on('error', (error: unknown) =>
+      this.onSyncEvent('error', 'error', error)
+    );
+    sync.on('change', (error?: unknown) =>
+      this.logger.debug("Sync event handled silently : 'sync.on.change'", error)
+    );
+    sync.on('complete', (error?: unknown) =>
+      this.logger.debug(
+        "Sync event handled silently : 'sync.on.complete'",
+        error
+      )
+    );
   }
 
-  stop(): void {
+  public stop(): void {
     this.syncHandler?.cancel();
     this.syncHandler = undefined;
 
-    this.setState({ status: 'stopped' });
+    this.setState('manual.stop', { status: 'stopped' });
   }
 
-  private setState(state: SyncState): void {
-    console.log('sync state changed', state);
+  private onSyncEvent(
+    syncEvent: string,
+    stateStatus: string,
+    error?: unknown
+  ): void {
+    const event = `sync.on.${syncEvent}`;
+    const state = {
+      status: stateStatus,
+      error: this.errorMessage(error),
+    } as SyncState;
+
+    this.setState(event, state, error);
+  }
+
+  private setState(event: string, state: SyncState, error?: unknown): void {
     this._state.set(state);
+    this.logStateChange(event, state, error);
   }
 
-  private errorMessage(error: unknown): string {
+  private logStateChange(
+    event: string,
+    newSyncState: SyncState,
+    syncError?: unknown
+  ): void {
+    const message = `Sync state changed to: '${newSyncState.status}' (event: '${event}'). `;
+    this.logger.debug(message, ...(syncError != null ? [syncError] : []));
+  }
+
+  private errorMessage(error?: unknown | undefined): string | undefined {
+    if (error === undefined) {
+      return undefined;
+    }
+
     return error instanceof Error ? error.message : 'Erreur de synchronisation';
   }
 }

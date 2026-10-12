@@ -16,11 +16,8 @@
     <ProjectReference Include="..\Notable.Auth.BuiltIn\Notable.Auth.BuiltIn.csproj" />
     <ProjectReference Include="..\Notable.Auth.None\Notable.Auth.None.csproj" />
     <ProjectReference Include="..\Notable.Auth\Notable.Auth.csproj" />
+    <ProjectReference Include="..\Notable.Core\Notable.Core.csproj" />
     <ProjectReference Include="..\Notable.CouchDb\Notable.CouchDb.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Controllers\" />
   </ItemGroup>
 
 </Project>

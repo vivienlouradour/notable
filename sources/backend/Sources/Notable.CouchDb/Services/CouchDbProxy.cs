@@ -3,7 +3,7 @@ using Microsoft.Extensions.Configuration;
 
 using Notable.Auth.Exceptions;
 using Notable.Auth.Services;
-
+using Notable.CouchDb.Helpers;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
@@ -60,7 +60,7 @@ namespace Notable.CouchDb.Services
             return response;
         }
 
-        public async Task EnsureDbExistsAsync(string dbUrl, CancellationToken cancellationToken)
+        private async Task EnsureDbExistsAsync(string dbUrl, CancellationToken cancellationToken)
         {
             var alreadyExisting = (await httpClient.GetAsync(dbUrl, cancellationToken)).IsSuccessStatusCode;
             if (alreadyExisting)

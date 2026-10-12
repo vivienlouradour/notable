@@ -1,5 +1,6 @@
 <Project>
- <PropertyGroup>
-   <ManagePackageVersionsCentrally>True</ManagePackageVersionsCentrally>
- </PropertyGroup>
+	<PropertyGroup>
+		<Version>0.0.0</Version>
+		<ManagePackageVersionsCentrally>True</ManagePackageVersionsCentrally>
+	</PropertyGroup>
 </Project>

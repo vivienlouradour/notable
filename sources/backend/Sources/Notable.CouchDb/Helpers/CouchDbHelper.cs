@@ -1,6 +1,6 @@
 ﻿using Notable.Auth.Models.Domain;
 
-namespace Notable.CouchDb
+namespace Notable.CouchDb.Helpers
 {
     internal static class CouchDbHelper
     {

@@ -8,7 +8,6 @@ namespace Notable.CouchDb
     {
         public static IServiceCollection AddCouchDb(this IServiceCollection services)
         {
-            services.AddTransient<ICouchDbService, CouchDbService>();
             services.AddTransient<ICouchDbProxy, CouchDbProxy>();
 
             return services;
