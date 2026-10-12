@@ -1,7 +1,7 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { Note, NoteMetadata } from './note.model';
-import { PouchDbService } from '../../core/persistence/pouchdb/pouchdb.service';
-import { BaseDocument } from '../../core/persistence/pouchdb/pouchdb.model';
+import { PouchDbService } from '../../core/server/pouchdb/pouchdb.service';
+import { BaseDocument } from '../../core/server/pouchdb/pouchdb.model';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 interface NoteDocument

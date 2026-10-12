@@ -20,12 +20,12 @@ namespace Notable.Core.Status
                 .WithTags("Status")
                 .RequireAuthorization();
 
-            statusGroup.MapGet("/", Version);
+            statusGroup.MapGet("/", Version).WithName("GetHealth");
 
             var statusSubGroup = statusGroup.MapGroup("/status");
 
-            statusSubGroup.MapGet("/version", Version);
-            statusSubGroup.MapGet("/health", () => TypedResults.Ok(new AppStatus("healthy")));
+            statusSubGroup.MapGet("/version", Version).WithName("Status_GetVersion");
+            statusSubGroup.MapGet("/health", () => TypedResults.Ok(new AppStatus("healthy"))).WithName("Status_GetHealth");
 
             return app;
         }

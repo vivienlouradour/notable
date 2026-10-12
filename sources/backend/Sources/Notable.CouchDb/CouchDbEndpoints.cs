@@ -11,6 +11,8 @@ namespace Notable.CouchDb
         {
             var group = app.MapGroup("/sync")
                 .WithTags("Sync")
+                .WithName("Sync")
+                .WithGroupName("Sync")
                 .RequireAuthorization();
 
             group.MapMethods(

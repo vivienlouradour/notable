@@ -3,7 +3,7 @@ import { RouterOutlet } from '@angular/router';
 import { NavBarComponent } from './shared/layout/nav-bar/nav-bar.component';
 import { FooterComponent } from './shared/layout/footer/footer.component';
 import { TranslateService } from '@ngx-translate/core';
-import { SyncService } from './core/persistence/pouchdb/sync.service';
+import { SyncService } from './core/server/pouchdb/sync.service';
 
 @Component({
   selector: 'app-root',

@@ -66,16 +66,10 @@ export class PouchDbService {
   }
 
   public syncWith(remoteDb: PouchDB.Database) {
-    return this.db
-      .sync(remoteDb, {
-        live: true,
-        retry: true,
-      })
-      .on('change', info => {
-        console.log('Sync change:', info);
-      })
-      .on('error', err => {
-        console.error('Sync error:', err);
-      });
+    return this.db.sync(remoteDb, {
+      live: true,
+      // retry: true,
+      retry: false,
+    });
   }
 }

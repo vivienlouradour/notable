@@ -47,6 +47,10 @@ export class SyncService {
   }
 
   public stop(): void {
+    if (this.state().status === 'stopped') {
+      return;
+    }
+
     this.syncHandler?.cancel();
     this.syncHandler = undefined;
 
