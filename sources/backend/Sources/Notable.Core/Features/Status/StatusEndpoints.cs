@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Routing;
 
-namespace Notable.Core.Status
+namespace Notable.Core.Features.Status
 {
     public record AppVersionDto(
         string Version,

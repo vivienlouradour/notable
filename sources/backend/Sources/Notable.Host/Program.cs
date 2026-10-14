@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using Notable.Core.Status;
+using Notable.Core.Features.Status;
 using Notable.CouchDb;
 using Notable.Host.Middlewares;
 using System.Text;
@@ -49,7 +49,7 @@ namespace Notable.Host
                 });
             });
 
-            builder.Services.AddCouchDb();
+            builder.Services.AddCouchDbServices();
             builder.Services.ConfigureNotableAuth(builder.Configuration);
             
             var app = builder.Build();

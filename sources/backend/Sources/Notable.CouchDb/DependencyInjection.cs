@@ -6,7 +6,7 @@ namespace Notable.CouchDb
 {
     public static class DependencyInjection
     {
-        public static IServiceCollection AddCouchDb(this IServiceCollection services)
+        public static IServiceCollection AddCouchDbServices(this IServiceCollection services)
         {
             services.AddTransient<ICouchDbProxy, CouchDbProxy>();
 
