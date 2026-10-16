@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
+
 using Notable.CouchDb.Services;
 
 namespace Notable.CouchDb
@@ -34,7 +35,7 @@ namespace Notable.CouchDb
         {
             var route = $"{catchAll}{context.Request.QueryString.Value}";
             var response = await couchDbProxy.ProxyRequestToUserDatabaseAsync(context.Request, route, cancellationToken);
-            
+
             context.Response.StatusCode = (int)response.StatusCode;
 
             foreach (var header in response.Headers)

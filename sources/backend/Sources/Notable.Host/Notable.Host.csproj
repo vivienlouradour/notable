@@ -9,15 +9,17 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="NSwag.AspNetCore" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Notable.Auth.BuiltIn\Notable.Auth.BuiltIn.csproj" />
-    <ProjectReference Include="..\Notable.Auth.None\Notable.Auth.None.csproj" />
-    <ProjectReference Include="..\Notable.Auth\Notable.Auth.csproj" />
     <ProjectReference Include="..\Notable.Core\Notable.Core.csproj" />
     <ProjectReference Include="..\Notable.CouchDb\Notable.CouchDb.csproj" />
+    <ProjectReference Include="..\Notable.Identity\Notable.Identity.csproj" />
   </ItemGroup>
 
 </Project>

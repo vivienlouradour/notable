@@ -1,12 +1,12 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Configuration;
-
-using Notable.Auth.Exceptions;
-using Notable.Auth.Services;
-using Notable.CouchDb.Helpers;
-using System.Net.Http.Headers;
+﻿using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
+
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
+
+using Notable.CouchDb.Helpers;
+using Notable.Identity.Common;
 
 namespace Notable.CouchDb.Services
 {
@@ -20,7 +20,7 @@ namespace Notable.CouchDb.Services
         {
             this.httpClient = httpClient;
             this.currentUser = currentUser;
-            couchDbBaseUrl = configuration["CouchDb:BaseUrl"] ?? "";
+            this.couchDbBaseUrl = configuration["CouchDb:BaseUrl"] ?? "";
 
             // CouchDb authentication
             var byteArray = Encoding.ASCII.GetBytes($"{configuration["CouchDb:User"]}:{configuration["CouchDb:Password"]}");
@@ -29,11 +29,8 @@ namespace Notable.CouchDb.Services
 
         public async Task<HttpResponseMessage> ProxyRequestToUserDatabaseAsync(HttpRequest request, string? route, CancellationToken cancellationToken)
         {
-            // Get the authenticated user
-            var user = currentUser.User ?? throw new NotAuthenticatedException();
-
             // Rebuild complete url to CouchDb
-            var dbUrl = CouchDbHelper.GetUserDbUrl(this.couchDbBaseUrl, user);
+            var dbUrl = CouchDbHelper.GetUserDbUrl(this.couchDbBaseUrl, this.currentUser);
             await EnsureDbExistsAsync(dbUrl, cancellationToken);
 
             var targetUrl = $"{dbUrl}/{route}";

@@ -1,7 +1,6 @@
-﻿using Notable.Auth.Exceptions;
-using Notable.Host.Models;
+﻿using System.Net;
 
-using System.Net;
+using Notable.Host.Models;
 
 namespace Notable.Host.Middlewares
 {
@@ -33,7 +32,7 @@ namespace Notable.Host.Middlewares
             var errorResponse = GetErrorResponseFromException(exception);
 
             context.Response.StatusCode = errorResponse.StatusCode;
-            
+
             await context.Response.WriteAsJsonAsync(errorResponse);
         }
 
@@ -41,7 +40,7 @@ namespace Notable.Host.Middlewares
         {
             return exception switch
             {
-                NotAuthenticatedException => new ErrorResponse { Message = "User not authenticated", StatusCode = (int)HttpStatusCode.Unauthorized },
+                UnauthorizedAccessException => new ErrorResponse { Message = "User not authenticated", StatusCode = (int)HttpStatusCode.Unauthorized },
                 _ => new ErrorResponse { Message = "Unhandled exception", StatusCode = (int)HttpStatusCode.InternalServerError }
             };
         }

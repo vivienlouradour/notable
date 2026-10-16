@@ -1,9 +1,10 @@
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Authentication;
+
 using Notable.Core.Features.Status;
 using Notable.CouchDb;
+using Notable.Host.Handlers;
 using Notable.Host.Middlewares;
-using System.Text;
+using Notable.Identity;
 
 namespace Notable.Host
 {
@@ -13,30 +14,9 @@ namespace Notable.Host
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            builder.Services
-                .AddControllers()
-                .HideBuiltInLoginControllerIfNecessary(builder.Configuration);
-            
             builder.Services.AddOpenApiDocument();
-
-            builder.Services
-                .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(options =>
-                {
-                    options.TokenValidationParameters = new TokenValidationParameters
-                    {
-                        ValidateIssuer = true,
-                        ValidateAudience = true,
-                        ValidateLifetime = true,
-                        ValidateIssuerSigningKey = true,
-                        ValidIssuer = "Jwt:Issuer",
-                        ValidAudience = "Jwt:Audience",
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("Jwt:Key"))
-                    };
-                });
             builder.Services.AddHttpClient();
-            builder.Services.AddHttpContextAccessor();
-            
+
             // Cors policy
             builder.Services.AddCors(options =>
             {
@@ -50,8 +30,18 @@ namespace Notable.Host
             });
 
             builder.Services.AddCouchDbServices();
-            builder.Services.ConfigureNotableAuth(builder.Configuration);
-            
+            builder.Services.AddIdentityServices(builder.Configuration);
+
+            if (builder.Environment.IsDevelopment())
+            {
+                builder.Services
+                   .AddAuthentication(options =>
+                   {
+                       options.DefaultAuthenticateScheme = "Development";
+                       options.DefaultChallengeScheme = "Development";
+                   }).AddScheme<AuthenticationSchemeOptions, DevAuthenticationHandler>("Development", _ => { });
+            }
+
             var app = builder.Build();
 
             app.UseMiddleware<ExceptionHandlingMiddleware>();
@@ -73,10 +63,12 @@ namespace Notable.Host
 
             app.UseCors("AllowAngular");
 
-            app.MapControllers();
+            // Map application endpoints
             app.MapCouchDbEndpoints();
-
+            app.MapIdentityEndpoints();
             app.MapStatusEndpoints();
+
+
             app.Run();
         }
     }
