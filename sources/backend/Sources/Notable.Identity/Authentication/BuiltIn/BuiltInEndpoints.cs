@@ -1,17 +1,22 @@
-﻿using Microsoft.AspNetCore.Routing;
+﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Routing;
 
 namespace Notable.Identity.Authentication.BuiltIn;
 
 internal static class BuiltInEndpoints
 {
-    public static IEndpointRouteBuilder MapBuiltInEndpoints(this IEndpointRouteBuilder app, AuthenticationOptions authOptions)
+    public static IEndpointRouteBuilder MapBuiltInEndpoints(this IEndpointRouteBuilder app)
     {
-        if (!authOptions.BuiltIn.Enabled)
-        {
-            return app;
-        }
+        var group = app.MapGroup("/builtin");
 
-        // Map built-in authentication endpoints
-        return app;
+        group.MapPost("/login", LoginAsync)
+            .WithName("AuthBuiltIn_Login");
+
+        return group;
+    }
+
+    private static Task LoginAsync(CancellationToken cancellationToken)
+    {
+        return Task.CompletedTask;
     }
 }

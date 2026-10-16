@@ -14,21 +14,25 @@ internal static class AuthenticationEndpoints
     public static IEndpointRouteBuilder MapAuthenticationEndpoints(this IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("/auth")
-            .WithTags("Auth")
-            .WithName("Authentication");
+            .WithTags("Auth");
 
         var authOptions = app.ServiceProvider.GetRequiredService<IOptions<AuthenticationOptions>>().Value;
 
-        group.MapGet("/methods", () => GetAuthenticationMethods(authOptions));
+        group.MapGet("/methods", GetAuthenticationMethods)
+            .WithName("Auth_GetMethods");
 
-        group.MapBuiltInEndpoints(authOptions);
-        group.MapOidcEndpoints(authOptions);
+        // /auth/me
+        // /auth/logout
+
+        group.MapBuiltInEndpoints();
+        group.MapOidcEndpoints();
 
         return app;
     }
 
-    private static AuthenticationMethodsResponse GetAuthenticationMethods(AuthenticationOptions authOptions)
+    private static AuthenticationMethodsResponse GetAuthenticationMethods(IOptions<AuthenticationOptions> options)
     {
+        var authOptions = options.Value;
         return new AuthenticationMethodsResponse(
                 new BuiltInMethodResponse(authOptions.BuiltIn.Enabled, authOptions.BuiltIn.AllowRegistration),
                 new OidcMethodResponse(authOptions.Oidc.Enabled, authOptions.Oidc.DisplayName));

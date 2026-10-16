@@ -1,18 +1,24 @@
-﻿using Microsoft.AspNetCore.Routing;
+﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Routing;
 
 namespace Notable.Identity.Authentication.Oidc;
 
 internal static class OidcEndpoints
 {
-    public static IEndpointRouteBuilder MapOidcEndpoints(this IEndpointRouteBuilder app, AuthenticationOptions authOptions)
+    public static IEndpointRouteBuilder MapOidcEndpoints(this IEndpointRouteBuilder app)
     {
-        if (!authOptions.Oidc.Enabled)
-        {
-            return app;
-        }
+        var group = app.MapGroup("/oidc");
 
-        // Map OIDC authentication endpoints
+        group.MapGet("/login", LoginAsync)
+            .WithName("AuthOidc_Login");
+
+        // /callback
+
         return app;
     }
 
+    private static Task LoginAsync(CancellationToken cancellationToken)
+    {
+        return Task.CompletedTask;
+    }
 }
