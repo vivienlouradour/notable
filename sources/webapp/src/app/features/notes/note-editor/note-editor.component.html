@@ -1,6 +1,6 @@
 @if (note(); as note) {
   <div
-    class="flex h-12 shrink-0 items-center justify-between gap-3 border-b border-base-300 px-4 content:px-6">
+    class="flex h-12 shrink-0 items-center justify-between gap-3 border-b border-base-300">
     <div
       class="breadcrumbs min-w-0 overflow-hidden py-0 text-xs text-base-content/75">
       <ul>
@@ -33,7 +33,7 @@
     </div>
   </div>
   <div
-    class="mx-auto flex w-full max-w-5xl flex-1 flex-col px-6 py-8 content:px-8 content:pt-9 content:pb-6 wide:pt-12 wide:pb-8">
+    class="flex flex-1 flex-col py-8 content:pt-9 content:pb-6 wide:pt-12 wide:pb-8">
     <div
       class="mb-8 grid size-14 place-items-center rounded-box bg-primary/10 text-primary">
       <app-icon class="size-8" />
@@ -83,7 +83,7 @@
     </div>
   </div>
 } @else {
-  <div class="flex flex-1 flex-col items-center justify-center gap-5 p-6">
+  <div class="flex flex-1 flex-col items-center justify-center gap-5 py-6">
     <app-icon class="size-10 text-base-content/75" />
     <h1 class="text-lg">{{ 'notes.unavailable' | translate }}</h1>
     <a class="btn btn-outline btn-sm" routerLink="/notes">{{
