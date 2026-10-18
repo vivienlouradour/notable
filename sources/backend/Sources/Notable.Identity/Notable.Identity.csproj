@@ -20,4 +20,8 @@
     <ProjectReference Include="..\Notable.Persistence\Notable.Persistence.csproj" />
   </ItemGroup>
   
+  <ItemGroup>
+    <InternalsVisibleTo Include="Notable.Identity.UnitTests" />
+  </ItemGroup>
+
 </Project>

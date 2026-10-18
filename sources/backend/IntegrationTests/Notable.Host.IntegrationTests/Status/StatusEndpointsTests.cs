@@ -16,33 +16,39 @@ public sealed class StatusEndpointsTests
     [DataRow("/status/version")]
     public async Task GetVersion_WhenAuthenticated_ReturnsAssemblyVersionAsJson(string path)
     {
+        // Arrange
         using var factory = new NotableWebApplicationFactory();
         using var client = factory.CreateApiClient(Guid.NewGuid());
 
+        // Act
         using var response = await client.GetAsync(path, TestContext.CancellationToken);
         var json = await response.Content.ReadAsStringAsync(TestContext.CancellationToken);
         using var document = JsonDocument.Parse(json);
 
-        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
-        Assert.AreEqual("application/json", response.Content.Headers.ContentType?.MediaType);
-        Assert.AreEqual(AppVersion.Version, document.RootElement.GetProperty("version").GetString());
-        Assert.AreEqual(AppVersion.FullVersion, document.RootElement.GetProperty("fullVersion").GetString());
-        Assert.AreEqual(AppVersion.AssemblyVersion, document.RootElement.GetProperty("assemblyVersion").GetString());
-        Assert.AreEqual(0, factory.Proxy.CallCount);
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        (response.Content.Headers.ContentType?.MediaType).Should().Be("application/json");
+        document.RootElement.GetProperty("version").GetString().Should().Be(AppVersion.Version);
+        document.RootElement.GetProperty("fullVersion").GetString().Should().Be(AppVersion.FullVersion);
+        document.RootElement.GetProperty("assemblyVersion").GetString().Should().Be(AppVersion.AssemblyVersion);
+        factory.Proxy.CallCount.Should().Be(0);
     }
 
     [TestMethod]
     public async Task GetHealth_WhenAuthenticated_ReturnsHealthyAsJson()
     {
+        // Arrange
         using var factory = new NotableWebApplicationFactory();
         using var client = factory.CreateApiClient(Guid.NewGuid());
 
+        // Act
         using var response = await client.GetAsync("/status/health", TestContext.CancellationToken);
         var json = await response.Content.ReadAsStringAsync(TestContext.CancellationToken);
         using var document = JsonDocument.Parse(json);
 
-        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
-        Assert.AreEqual("application/json", response.Content.Headers.ContentType?.MediaType);
-        Assert.AreEqual("healthy", document.RootElement.GetProperty("status").GetString());
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        (response.Content.Headers.ContentType?.MediaType).Should().Be("application/json");
+        document.RootElement.GetProperty("status").GetString().Should().Be("healthy");
     }
 }

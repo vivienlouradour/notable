@@ -14,4 +14,8 @@
     <ProjectReference Include="..\Notable.Identity.Common\Notable.Identity.Common.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="Notable.CouchDb.UnitTests" />
+  </ItemGroup>
+
 </Project>

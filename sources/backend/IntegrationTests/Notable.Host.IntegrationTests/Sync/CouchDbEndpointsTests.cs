@@ -21,6 +21,7 @@ public sealed class CouchDbEndpointsTests
     [DataRow("/sync/_changes?feed=longpoll&since=42%3Aabc", "_changes?feed=longpoll&since=42%3Aabc")]
     public async Task Sync_WhenAuthenticated_PassesCatchAllPathAndQueryToProxy(string path, string expectedRoute)
     {
+        // Arrange
         using var factory = new NotableWebApplicationFactory();
         string? receivedRoute = null;
         factory.Proxy.RespondAsync = (_, route, _) =>
@@ -30,11 +31,13 @@ public sealed class CouchDbEndpointsTests
         };
         using var client = factory.CreateApiClient(Guid.NewGuid());
 
+        // Act
         using var response = await client.GetAsync(path, TestContext.CancellationToken);
 
-        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
-        Assert.AreEqual(expectedRoute, receivedRoute);
-        Assert.AreEqual(1, factory.Proxy.CallCount);
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        receivedRoute.Should().Be(expectedRoute);
+        factory.Proxy.CallCount.Should().Be(1);
     }
 
     [TestMethod]
@@ -46,6 +49,7 @@ public sealed class CouchDbEndpointsTests
     [DataRow("PATCH")]
     public async Task Sync_ForSupportedMethod_PassesRequestAndCancellationTokenToProxy(string method)
     {
+        // Arrange
         using var factory = new NotableWebApplicationFactory();
         var userId = Guid.NewGuid();
         string? receivedMethod = null;
@@ -72,16 +76,18 @@ public sealed class CouchDbEndpointsTests
         };
         request.Headers.IfMatch.Add(new EntityTagHeaderValue("\"2-revision\""));
 
+        // Act
         using var response = await client.SendAsync(request, TestContext.CancellationToken);
 
-        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
-        Assert.AreEqual(method, receivedMethod);
-        Assert.AreEqual("{\"value\":\"été\"}", receivedBody);
-        Assert.AreEqual("application/json; charset=utf-8", receivedContentType);
-        Assert.AreEqual("\"2-revision\"", receivedHeader);
-        Assert.AreEqual(userId, receivedUserId);
-        Assert.IsTrue(receivedRequestAborted);
-        Assert.AreEqual(1, factory.Proxy.CallCount);
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        receivedMethod.Should().Be(method);
+        receivedBody.Should().Be("{\"value\":\"été\"}");
+        receivedContentType.Should().Be("application/json; charset=utf-8");
+        receivedHeader.Should().Be("\"2-revision\"");
+        receivedUserId.Should().Be(userId);
+        receivedRequestAborted.Should().BeTrue();
+        factory.Proxy.CallCount.Should().Be(1);
     }
 
     [TestMethod]
@@ -92,6 +98,7 @@ public sealed class CouchDbEndpointsTests
     [DataRow(503)]
     public async Task Sync_WhenProxyResponds_PreservesStatusBodyAndHeaders(int statusCode)
     {
+        // Arrange
         const string body = "{\"id\":\"note\",\"rev\":\"2-révision\"}";
         using var upstream = new HttpResponseMessage((HttpStatusCode)statusCode)
         {
@@ -104,28 +111,32 @@ public sealed class CouchDbEndpointsTests
         factory.Proxy.RespondAsync = (_, _, _) => Task.FromResult(upstream);
         using var client = factory.CreateApiClient(Guid.NewGuid());
 
+        // Act
         using var response = await client.GetAsync("/sync/document", TestContext.CancellationToken);
         var responseBody = await response.Content.ReadAsStringAsync(TestContext.CancellationToken);
 
-        Assert.AreEqual((HttpStatusCode)statusCode, response.StatusCode);
-        Assert.AreEqual(body, responseBody);
-        Assert.AreEqual("application/json", response.Content.Headers.ContentType?.MediaType);
-        Assert.AreEqual("utf-8", response.Content.Headers.ContentType?.CharSet);
-        Assert.AreEqual("\"2-revision\"", response.Headers.ETag?.Tag);
-        CollectionAssert.AreEqual(new[] { "request-42" }, response.Headers.GetValues("X-Couch-Request-ID").ToArray());
-        Assert.IsFalse(response.Headers.Contains("Transfer-Encoding"));
+        // Assert
+        response.StatusCode.Should().Be((HttpStatusCode)statusCode);
+        responseBody.Should().Be(body);
+        (response.Content.Headers.ContentType?.MediaType).Should().Be("application/json");
+        (response.Content.Headers.ContentType?.CharSet).Should().Be("utf-8");
+        (response.Headers.ETag?.Tag).Should().Be("\"2-revision\"");
+        response.Headers.GetValues("X-Couch-Request-ID").ToArray().Should().Equal(new[] { "request-42" });
+        response.Headers.Contains("Transfer-Encoding").Should().BeFalse();
     }
 
     [TestMethod]
     [Timeout(30_000, CooperativeCancellation = true)]
     public async Task Sync_WhenUpstreamStreams_DeliversFirstChunkBeforeUpstreamCompletes()
     {
+        // Arrange
         using var content = new GatedHttpContent();
         using var upstream = new HttpResponseMessage(HttpStatusCode.OK) { Content = content };
         using var factory = new NotableWebApplicationFactory();
         factory.Proxy.RespondAsync = (_, _, _) => Task.FromResult(upstream);
         using var client = factory.CreateApiClient(Guid.NewGuid());
 
+        // Act
         try
         {
             using var response = await client.GetAsync("/sync/_changes?feed=continuous", HttpCompletionOption.ResponseHeadersRead,
@@ -134,14 +145,15 @@ public sealed class CouchDbEndpointsTests
             using var reader = new StreamReader(stream);
             var firstLine = await reader.ReadLineAsync(TestContext.CancellationToken);
 
-            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
-            Assert.AreEqual("application/x-ndjson", response.Content.Headers.ContentType?.MediaType);
-            Assert.AreEqual("{\"seq\":1}", firstLine);
-
             // The upstream cannot produce its remaining content until the client has read the first line.
             content.Complete();
             var remainingContent = await reader.ReadToEndAsync(TestContext.CancellationToken);
-            Assert.AreEqual("{\"seq\":2}\n", remainingContent);
+
+            // Assert
+            response.StatusCode.Should().Be(HttpStatusCode.OK);
+            (response.Content.Headers.ContentType?.MediaType).Should().Be("application/x-ndjson");
+            firstLine.Should().Be("{\"seq\":1}");
+            remainingContent.Should().Be("{\"seq\":2}\n");
         }
         finally
         {
@@ -152,13 +164,16 @@ public sealed class CouchDbEndpointsTests
     [TestMethod]
     public async Task Sync_WhenMethodIsUnsupported_Returns405WithoutCallingProxy()
     {
+        // Arrange
         using var factory = new NotableWebApplicationFactory();
         using var client = factory.CreateApiClient(Guid.NewGuid());
         using var request = new HttpRequestMessage(HttpMethod.Head, "/sync/document");
 
+        // Act
         using var response = await client.SendAsync(request, TestContext.CancellationToken);
 
-        Assert.AreEqual(HttpStatusCode.MethodNotAllowed, response.StatusCode);
-        Assert.AreEqual(0, factory.Proxy.CallCount);
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.MethodNotAllowed);
+        factory.Proxy.CallCount.Should().Be(0);
     }
 }

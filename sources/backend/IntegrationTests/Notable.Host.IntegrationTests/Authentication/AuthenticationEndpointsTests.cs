@@ -19,6 +19,7 @@ public sealed class AuthenticationEndpointsTests
     [DataRow(true, true, true)]
     public async Task GetMethods_WhenAnonymous_ReturnsConfiguredPublicOptions(bool builtInEnabled, bool oidcEnabled, bool allowRegistration)
     {
+        // Arrange
         var settings = CreateOidcSettings();
         settings["Authentication:BuiltIn:Enabled"] = builtInEnabled.ToString();
         settings["Authentication:BuiltIn:AllowRegistration"] = allowRegistration.ToString();
@@ -26,45 +27,48 @@ public sealed class AuthenticationEndpointsTests
         using var factory = new NotableWebApplicationFactory(settings);
         using var client = factory.CreateApiClient();
 
+        // Act
         using var response = await client.GetAsync("/auth/methods", TestContext.CancellationToken);
         var json = await response.Content.ReadAsStringAsync(TestContext.CancellationToken);
         using var document = JsonDocument.Parse(json);
 
-        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
-        Assert.AreEqual("application/json", response.Content.Headers.ContentType?.MediaType);
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        (response.Content.Headers.ContentType?.MediaType).Should().Be("application/json");
         var builtIn = document.RootElement.GetProperty("builtInMethodResponse");
         var oidc = document.RootElement.GetProperty("oidcMethodResponse");
-        Assert.AreEqual(builtInEnabled, builtIn.GetProperty("enabled").GetBoolean());
-        Assert.AreEqual(allowRegistration, builtIn.GetProperty("allowRegistration").GetBoolean());
-        Assert.AreEqual(oidcEnabled, oidc.GetProperty("enabled").GetBoolean());
-        Assert.AreEqual("Test identity provider", oidc.GetProperty("displayName").GetString());
+        builtIn.GetProperty("enabled").GetBoolean().Should().Be(builtInEnabled);
+        builtIn.GetProperty("allowRegistration").GetBoolean().Should().Be(allowRegistration);
+        oidc.GetProperty("enabled").GetBoolean().Should().Be(oidcEnabled);
+        oidc.GetProperty("displayName").GetString().Should().Be("Test identity provider");
 
         // Lock the public contract down so private OIDC configuration cannot leak into this response.
-        CollectionAssert.AreEquivalent(new[] { "builtInMethodResponse", "oidcMethodResponse" },
-            document.RootElement.EnumerateObject().Select(property => property.Name).ToArray());
-        CollectionAssert.AreEquivalent(new[] { "enabled", "allowRegistration" },
-            builtIn.EnumerateObject().Select(property => property.Name).ToArray());
-        CollectionAssert.AreEquivalent(new[] { "enabled", "displayName" },
-            oidc.EnumerateObject().Select(property => property.Name).ToArray());
-        Assert.AreEqual(0, factory.Proxy.CallCount);
+        document.RootElement.EnumerateObject().Select(property => property.Name).ToArray().Should().BeEquivalentTo(new[] { "builtInMethodResponse", "oidcMethodResponse" });
+        builtIn.EnumerateObject().Select(property => property.Name).ToArray().Should().BeEquivalentTo(new[] { "enabled", "allowRegistration" });
+        oidc.EnumerateObject().Select(property => property.Name).ToArray().Should().BeEquivalentTo(new[] { "enabled", "displayName" });
+        factory.Proxy.CallCount.Should().Be(0);
     }
 
     [TestMethod]
     public void Start_WhenAllAuthenticationMethodsAreDisabled_FailsValidation()
     {
+        // Arrange
         using var factory = new NotableWebApplicationFactory(new Dictionary<string, string?>
         {
             ["Authentication:BuiltIn:Enabled"] = "false",
             ["Authentication:Oidc:Enabled"] = "false"
         });
 
-        var exception = Assert.ThrowsExactly<OptionsValidationException>(() =>
+        // Act
+        Action act = () =>
         {
             using var client = factory.CreateApiClient();
-        });
+        };
 
-        CollectionAssert.Contains(exception.Failures.ToArray(),
-            "At least one authentication method must be enabled (BuiltIn or OIDC).");
+        // Assert
+        var exception = act.Should().ThrowExactly<OptionsValidationException>().Which;
+
+        exception.Failures.ToArray().Should().Contain("At least one authentication method must be enabled (BuiltIn or OIDC).");
     }
 
     [TestMethod]
@@ -73,16 +77,21 @@ public sealed class AuthenticationEndpointsTests
     [DataRow("ClientSecret")]
     public void Start_WhenEnabledOidcIsIncomplete_FailsValidation(string missingSetting)
     {
+        // Arrange
         var settings = CreateOidcSettings();
         settings[$"Authentication:Oidc:{missingSetting}"] = " ";
         using var factory = new NotableWebApplicationFactory(settings);
 
-        var exception = Assert.ThrowsExactly<OptionsValidationException>(() =>
+        // Act
+        Action act = () =>
         {
             using var client = factory.CreateApiClient();
-        });
+        };
 
-        CollectionAssert.Contains(exception.Failures.ToArray(), "OIDC requires Authority, ClientId and ClientSecret.");
+        // Assert
+        var exception = act.Should().ThrowExactly<OptionsValidationException>().Which;
+
+        exception.Failures.ToArray().Should().Contain("OIDC requires Authority, ClientId and ClientSecret.");
     }
 
     private static Dictionary<string, string?> CreateOidcSettings()

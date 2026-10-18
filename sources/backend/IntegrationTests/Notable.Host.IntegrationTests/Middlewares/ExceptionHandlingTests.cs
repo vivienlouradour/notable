@@ -20,6 +20,7 @@ public sealed class ExceptionHandlingTests
     [DataRow("cancelledWithoutClientDisconnect", 500, "Unhandled exception")]
     public async Task Sync_WhenProxyThrowsBeforeResponse_ReturnsSanitizedJsonError(string error, int expectedStatus, string expectedMessage)
     {
+        // Arrange
         Exception exception = error switch
         {
             "unauthorized" => new UnauthorizedAccessException("Private authentication details"),
@@ -31,22 +32,24 @@ public sealed class ExceptionHandlingTests
         factory.Proxy.RespondAsync = (_, _, _) => Task.FromException<HttpResponseMessage>(exception);
         using var client = factory.CreateApiClient(Guid.NewGuid());
 
+        // Act
         using var response = await client.GetAsync("/sync/document", TestContext.CancellationToken);
         var json = await response.Content.ReadAsStringAsync(TestContext.CancellationToken);
         using var document = JsonDocument.Parse(json);
 
-        Assert.AreEqual((HttpStatusCode)expectedStatus, response.StatusCode);
-        Assert.AreEqual("application/json", response.Content.Headers.ContentType?.MediaType);
-        Assert.AreEqual(expectedStatus, document.RootElement.GetProperty("statusCode").GetInt32());
-        Assert.AreEqual(expectedMessage, document.RootElement.GetProperty("message").GetString());
-        CollectionAssert.AreEquivalent(new[] { "message", "statusCode" },
-            document.RootElement.EnumerateObject().Select(property => property.Name).ToArray());
-        Assert.AreEqual(1, factory.Proxy.CallCount);
+        // Assert
+        response.StatusCode.Should().Be((HttpStatusCode)expectedStatus);
+        (response.Content.Headers.ContentType?.MediaType).Should().Be("application/json");
+        document.RootElement.GetProperty("statusCode").GetInt32().Should().Be(expectedStatus);
+        document.RootElement.GetProperty("message").GetString().Should().Be(expectedMessage);
+        document.RootElement.EnumerateObject().Select(property => property.Name).ToArray().Should().BeEquivalentTo(new[] { "message", "statusCode" });
+        factory.Proxy.CallCount.Should().Be(1);
     }
 
     [TestMethod]
     public async Task Sync_WhenAuthenticatedIdentityHasMalformedUserId_Returns401()
     {
+        // Arrange
         using var factory = new NotableWebApplicationFactory();
         factory.Proxy.RespondAsync = (request, _, _) =>
         {
@@ -56,11 +59,13 @@ public sealed class ExceptionHandlingTests
         using var client = factory.CreateApiClient();
         client.DefaultRequestHeaders.Add(TestAuthenticationHandler.UserIdHeader, "invalid-user-id");
 
+        // Act
         using var response = await client.GetAsync("/sync/document", TestContext.CancellationToken);
         var json = await response.Content.ReadAsStringAsync(TestContext.CancellationToken);
         using var document = JsonDocument.Parse(json);
 
-        Assert.AreEqual(HttpStatusCode.Unauthorized, response.StatusCode);
-        Assert.AreEqual("User not authenticated", document.RootElement.GetProperty("message").GetString());
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+        document.RootElement.GetProperty("message").GetString().Should().Be("User not authenticated");
     }
 }

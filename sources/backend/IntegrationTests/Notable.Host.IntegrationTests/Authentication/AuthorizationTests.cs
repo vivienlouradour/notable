@@ -17,14 +17,17 @@ public sealed class AuthorizationTests
     [DataRow("/sync/_changes?feed=longpoll&since=0")]
     public async Task GetProtectedEndpoint_WhenAnonymous_Returns401WithoutRedirect(string path)
     {
+        // Arrange
         using var factory = new NotableWebApplicationFactory();
         using var client = factory.CreateApiClient();
 
+        // Act
         using var response = await client.GetAsync(path, TestContext.CancellationToken);
 
-        Assert.AreEqual(HttpStatusCode.Unauthorized, response.StatusCode);
-        Assert.IsNull(response.Headers.Location);
-        Assert.AreEqual(0, factory.Proxy.CallCount);
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+        response.Headers.Location.Should().BeNull();
+        factory.Proxy.CallCount.Should().Be(0);
     }
 
     [TestMethod]
@@ -35,14 +38,17 @@ public sealed class AuthorizationTests
     [DataRow("PATCH")]
     public async Task Sync_WhenAnonymous_RejectsEverySupportedWriteMethod(string method)
     {
+        // Arrange
         using var factory = new NotableWebApplicationFactory();
         using var client = factory.CreateApiClient();
         using var request = new HttpRequestMessage(new HttpMethod(method), "/sync/document");
 
+        // Act
         using var response = await client.SendAsync(request, TestContext.CancellationToken);
 
-        Assert.AreEqual(HttpStatusCode.Unauthorized, response.StatusCode);
-        Assert.IsNull(response.Headers.Location);
-        Assert.AreEqual(0, factory.Proxy.CallCount);
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+        response.Headers.Location.Should().BeNull();
+        factory.Proxy.CallCount.Should().Be(0);
     }
 }
