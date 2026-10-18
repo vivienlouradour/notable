@@ -1,9 +1,9 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { environment } from '../../../../environments/environment';
-import { PouchDbService } from './pouchdb.service';
-import { SyncState } from './pouchdb.model';
+import { PouchDbService } from '../pouchdb/pouchdb.service';
+import { SyncState } from '../pouchdb/pouchdb.model';
 import { LoggerService } from '../../logger/logger.service';
-import { POUCHDB_FACTORY } from './pouchdb.factory';
+import { POUCHDB_FACTORY } from '../pouchdb/pouchdb.factory';
 
 @Injectable({ providedIn: 'root' })
 export class SyncService {

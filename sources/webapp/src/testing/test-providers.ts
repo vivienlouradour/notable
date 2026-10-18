@@ -3,7 +3,7 @@ import { signal } from '@angular/core';
 import { provideTranslateService } from '@ngx-translate/core';
 import { EMPTY } from 'rxjs';
 import { PouchDbService } from '../app/core/server/pouchdb/pouchdb.service';
-import { SyncService } from '../app/core/server/pouchdb/sync.service';
+import { SyncService } from '../app/core/server/pouchdb-sync/sync.service';
 import { ServerStatusService } from '../app/core/server/status/server-status.service';
 import { SyncState } from '../app/core/server/pouchdb/pouchdb.model';
 

@@ -11,7 +11,7 @@ import { HttpClient, provideHttpClient, withXhr } from '@angular/common/http';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { API_BASE_URL } from './core/server/api/generated/api-client';
 import { environment } from '../environments/environment';
-import { SyncCoordinatorService } from './core/server/pouchdb/sync-coordinator.service';
+import { SyncCoordinatorService } from './core/server/pouchdb-sync/sync-coordinator.service';
 
 const httpLoaderFactory: (http: HttpClient) => TranslateHttpLoader = (
   http: HttpClient

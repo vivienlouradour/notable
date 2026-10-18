@@ -8,7 +8,7 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TranslatePipe } from '@ngx-translate/core';
 import { switchMap, tap, timer } from 'rxjs';
-import { SyncService } from '../../../core/server/pouchdb/sync.service';
+import { SyncService } from '../../../core/server/pouchdb-sync/sync.service';
 import { ServerStatusService } from '../../../core/server/status/server-status.service';
 import { IconComponent } from '../icon/icon.component';
 

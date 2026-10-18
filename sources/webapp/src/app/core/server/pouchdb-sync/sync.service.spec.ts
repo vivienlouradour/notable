@@ -2,9 +2,9 @@ import { TestBed } from '@angular/core/testing';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { environment } from '../../../../environments/environment';
 import { LoggerService } from '../../logger/logger.service';
-import { PouchDbService } from './pouchdb.service';
+import { PouchDbService } from '../pouchdb/pouchdb.service';
 import { SyncService } from './sync.service';
-import { POUCHDB_FACTORY } from './pouchdb.factory';
+import { POUCHDB_FACTORY } from '../pouchdb/pouchdb.factory';
 
 describe('SyncService', () => {
   const remote = {};

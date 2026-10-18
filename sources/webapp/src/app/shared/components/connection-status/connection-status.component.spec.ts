@@ -6,7 +6,7 @@ import {
   SyncState,
   SyncStatus,
 } from '../../../core/server/pouchdb/pouchdb.model';
-import { SyncService } from '../../../core/server/pouchdb/sync.service';
+import { SyncService } from '../../../core/server/pouchdb-sync/sync.service';
 import { ServerStatusService } from '../../../core/server/status/server-status.service';
 import { ConnectionStatusComponent } from './connection-status.component';
 
