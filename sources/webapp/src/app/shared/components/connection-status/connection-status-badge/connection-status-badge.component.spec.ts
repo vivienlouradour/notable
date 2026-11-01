@@ -46,7 +46,7 @@ describe('ConnectionStatusBadgeComponent', () => {
 
   it.each([
     ['offline', 'offline', 'cloud-off', 'warning'],
-    ['sign-in-required', 'signInRequired', 'log-in', 'warning'],
+    ['sign-in-required', 'signInRequired', 'lock-keyhole', 'warning'],
     ['synced', 'synced', 'circle-check', 'success'],
     ['syncing', 'syncing', 'refresh-cw', 'success'],
     ['sync-disabled', 'syncDisabled', 'circle-pause', 'warning'],

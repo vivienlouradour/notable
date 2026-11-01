@@ -1,15 +1,15 @@
 # Build stage
-FROM mcr.microsoft.com/dotnet/sdk:9.0-alpine AS build
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /app
-#COPY <other-proj-dir>/*.csproj <other-proj-dir>/
-COPY Notable.Host/*.csproj Notable.Host/
-RUN dotnet restore Notable.Host
-COPY . .
-RUN dotnet publish Notable.Host -c Release -o out --no-restore
+COPY Directory.Build.props Directory.Packages.props ./
+COPY Sources/ Sources/
+RUN dotnet restore Sources/Notable.Host/Notable.Host.csproj
+RUN dotnet publish Sources/Notable.Host/Notable.Host.csproj -c Release -o out --no-restore
 
 # Runtime stage
-FROM mcr.microsoft.com/dotnet/aspnet:9.0-alpine
+FROM mcr.microsoft.com/dotnet/aspnet:10.0
 WORKDIR /app
 COPY --from=build /app/out .
+ENV ASPNETCORE_HTTP_PORTS=80
 EXPOSE 80
 ENTRYPOINT ["dotnet", "Notable.Host.dll"]

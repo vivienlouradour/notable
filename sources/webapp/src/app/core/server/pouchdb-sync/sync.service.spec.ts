@@ -66,11 +66,11 @@ describe('SyncService', () => {
     expect(service.state().status).toBe('idle');
   });
 
-  it('reports an offline pause and clears the error when replication resumes', () => {
+  it('reports a pause with an error and clears the error when replication resumes', () => {
     service.start();
     emit('paused', new Error('network unavailable'));
     expect(service.state()).toEqual({
-      status: 'offline',
+      status: 'error',
       error: 'network unavailable',
     });
     emit('active');

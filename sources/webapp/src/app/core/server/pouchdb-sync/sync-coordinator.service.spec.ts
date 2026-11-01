@@ -1,4 +1,4 @@
-import { signal } from '@angular/core';
+import { computed, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ServerStatusService } from '../server-status/server-status.service';
@@ -23,7 +23,13 @@ describe('SyncCoordinatorService', () => {
         SyncCoordinatorService,
         { provide: ServerStatusService, useValue: { isConnected: connected } },
         { provide: SyncService, useValue: sync },
-        { provide: AuthenticationService, useValue: { status } },
+        {
+          provide: AuthenticationService,
+          useValue: {
+            status,
+            isAuthenticated: computed(() => status() === 'authenticated'),
+          },
+        },
       ],
     });
   });

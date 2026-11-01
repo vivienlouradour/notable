@@ -1,0 +1,96 @@
+name: Docker Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: read
+
+# Both images and all release versions share one lock (including reruns).
+concurrency:
+  group: docker-release
+  cancel-in-progress: false
+
+jobs:
+  promote:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Validate release tag, versions and source commit
+        id: release
+        run: python3 .github/scripts/versions.py --release "$GITHUB_REF_NAME"
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Resolve digests and check both images before publication
+        id: plan
+        env:
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_VERSION: ${{ steps.release.outputs.version }}
+          RELEASE_COMMIT: ${{ steps.release.outputs.commit }}
+        run: python3 .github/scripts/docker_release.py plan "$RUNNER_TEMP/release-plan.json"
+      - uses: docker/metadata-action@v5
+        id: backend
+        with:
+          images: ${{ steps.plan.outputs.backend }}
+          flavor: latest=false
+          tags: |
+            type=raw,value=${{ steps.release.outputs.version }}
+            type=raw,value=latest,enable=${{ steps.plan.outputs.latest == 'true' }}
+      - uses: docker/metadata-action@v5
+        id: webapp
+        with:
+          images: ${{ steps.plan.outputs.webapp }}
+          flavor: latest=false
+          tags: |
+            type=raw,value=${{ steps.release.outputs.version }}
+            type=raw,value=latest,enable=${{ steps.plan.outputs.latest == 'true' }}
+      - name: Recheck release preconditions and metadata tags
+        id: checks
+        env:
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BACKEND_METADATA: ${{ steps.backend.outputs.json }}
+          WEBAPP_METADATA: ${{ steps.webapp.outputs.json }}
+        run: python3 .github/scripts/docker_release.py check "$RUNNER_TEMP/release-plan.json"
+      - name: Promote version manifests without rebuilding
+        env:
+          BACKEND_SOURCE: ${{ steps.plan.outputs.backend_source }}
+          WEBAPP_SOURCE: ${{ steps.plan.outputs.webapp_source }}
+          BACKEND_TAG: ${{ steps.checks.outputs.backend_version_tag }}
+          WEBAPP_TAG: ${{ steps.checks.outputs.webapp_version_tag }}
+        run: |
+          docker buildx imagetools create --prefer-index=false \
+            --tag "$BACKEND_TAG" "$BACKEND_SOURCE"
+          docker buildx imagetools create --prefer-index=false \
+            --tag "$WEBAPP_TAG" "$WEBAPP_SOURCE"
+      - name: Verify version digests and recheck latest eligibility
+        env:
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python3 .github/scripts/docker_release.py verify-versions "$RUNNER_TEMP/release-plan.json"
+      - name: Promote latest manifests without rebuilding
+        if: steps.plan.outputs.latest == 'true'
+        env:
+          BACKEND_SOURCE: ${{ steps.plan.outputs.backend_source }}
+          WEBAPP_SOURCE: ${{ steps.plan.outputs.webapp_source }}
+          BACKEND_TAG: ${{ steps.checks.outputs.backend_latest_tag }}
+          WEBAPP_TAG: ${{ steps.checks.outputs.webapp_latest_tag }}
+        run: |
+          docker buildx imagetools create --prefer-index=false \
+            --tag "$BACKEND_TAG" "$BACKEND_SOURCE"
+          docker buildx imagetools create --prefer-index=false \
+            --tag "$WEBAPP_TAG" "$WEBAPP_SOURCE"
+      - name: Verify latest digests
+        if: steps.plan.outputs.latest == 'true'
+        env:
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python3 .github/scripts/docker_release.py verify-latest "$RUNNER_TEMP/release-plan.json"

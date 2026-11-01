@@ -163,7 +163,7 @@ describe('ConnectionStatusDetailsComponent', () => {
         .querySelector('time')
         ?.textContent?.trim();
     expect(text()).toBe('à l’instant');
-    vi.advanceTimersByTime(1000);
+    vi.advanceTimersByTime(2000);
     fixture.detectChanges();
     expect(text()).toBe('il y a 1 minute');
     vi.advanceTimersByTime(60_000);
@@ -175,10 +175,17 @@ describe('ConnectionStatusDetailsComponent', () => {
   });
 
   it('switches from today to yesterday when the local day changes', () => {
-    vi.setSystemTime(new Date(2026, 9, 26, 23, 59, 59));
+    vi.setSystemTime(new Date(2026, 9, 26, 23, 59, 57));
     lastSyncedAt.set(new Date(2026, 9, 26, 10, 30));
     // Refresh the clock after changing the system time.
-    vi.advanceTimersByTime(1000);
+    vi.advanceTimersByTime(2000);
+    fixture.detectChanges();
+    expect(
+      (fixture.nativeElement as HTMLElement)
+        .querySelector('time')
+        ?.textContent?.trim()
+    ).toBe('aujourd’hui à 10:30');
+    vi.advanceTimersByTime(2000);
     fixture.detectChanges();
     expect(
       (fixture.nativeElement as HTMLElement)
@@ -189,7 +196,7 @@ describe('ConnectionStatusDetailsComponent', () => {
 
   it('keeps minute precision across midnight and handles a slightly future date', () => {
     vi.setSystemTime(new Date(2026, 9, 27, 0, 10));
-    vi.advanceTimersByTime(1000);
+    vi.advanceTimersByTime(2000);
     lastSyncedAt.set(new Date(2026, 9, 26, 23, 50));
     fixture.detectChanges();
     expect(
