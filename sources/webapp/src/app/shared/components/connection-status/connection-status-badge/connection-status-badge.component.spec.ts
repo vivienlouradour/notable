@@ -24,6 +24,7 @@ describe('ConnectionStatusBadgeComponent', () => {
           useValue: {
             globalStatus,
             serverStatus: signal(false),
+            serverVersion: signal(undefined),
             authStatus: signal(false),
             syncStatus: signal('sync-disabled'),
             lastSyncedAt: signal(undefined),

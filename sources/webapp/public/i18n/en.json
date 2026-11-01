@@ -52,13 +52,16 @@
         "justNow": "just now",
         "todayAt": "today at {{time}}",
         "yesterdayAt": "yesterday at {{time}}",
-        "dateAt": "{{date}} at {{time}}"
+        "onDate": "on {{date}}"
       },
       "neverSynced": "No synchronization yet",
-      "localHint": "Your notes remain available on this device.",
+      "serverVersion": "Server version",
+      "application": "App",
+      "applicationVersion": "Application version",
       "connectedAlert": "Connected to the server.",
       "disconnectedAlert": "Disconnected from the server. Your notes remain available offline."
     },
+    "webVersion": "Web version",
     "documentsCount": "documents"
   },
   "auth": {

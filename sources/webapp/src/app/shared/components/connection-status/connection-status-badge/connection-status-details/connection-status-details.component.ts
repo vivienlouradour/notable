@@ -10,18 +10,26 @@ import {
   LucideCircleX,
   LucideClock3,
   LucideDynamicIcon,
+  LucideMonitor,
   LucideRefreshCw,
   LucideServer,
   LucideUserRound,
 } from '@lucide/angular';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { interval, map } from 'rxjs';
+import { version } from '../../../../../../../package.json';
 import { CONNECTION_STATUS_PRESENTATION } from '../../connection-status.presentation';
 import { ConnectionStatusService } from '../../connection-status.service';
 
 @Component({
   selector: 'app-connection-status-details',
-  imports: [TranslatePipe, LucideDynamicIcon, LucideClock3],
+  imports: [
+    TranslatePipe,
+    LucideDynamicIcon,
+    LucideClock3,
+    LucideMonitor,
+    LucideServer,
+  ],
   templateUrl: './connection-status-details.component.html',
   host: {
     class:
@@ -30,6 +38,7 @@ import { ConnectionStatusService } from '../../connection-status.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ConnectionStatusDetailsComponent {
+  protected readonly applicationVersion = version;
   protected readonly connectionStatusService = inject(ConnectionStatusService);
   private readonly translate = inject(TranslateService);
   private readonly language = toSignal(
@@ -123,14 +132,12 @@ export class ConnectionStatusDetailsComponent {
       return this.translate.instant(key + 'yesterdayAt', { time });
     }
 
-    const fullDate = this.translate.instant(key + 'dateAt', {
+    return this.translate.instant(key + 'onDate', {
       date: new Intl.DateTimeFormat(language, {
         day: '2-digit',
         month: '2-digit',
         year: 'numeric',
       }).format(date),
-      time,
     });
-    return `${relativeTime.format(-days, 'day')} · ${fullDate}`;
   }
 }

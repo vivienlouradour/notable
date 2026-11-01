@@ -5,10 +5,12 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ConnectionStatusDetailsComponent } from './connection-status-details.component';
 import { SyncStatus } from '../../connection-status.model';
 import { ConnectionStatusService } from '../../connection-status.service';
+import { version } from '../../../../../../../package.json';
 
 describe('ConnectionStatusDetailsComponent', () => {
   let fixture: ComponentFixture<ConnectionStatusDetailsComponent>;
   const serverStatus = signal(false);
+  const serverVersion = signal<string | undefined>(undefined);
   const authStatus = signal(false);
   const syncStatus = signal<SyncStatus>('sync-disabled');
   const lastSyncedAt = signal<Date | undefined>(undefined);
@@ -17,6 +19,7 @@ describe('ConnectionStatusDetailsComponent', () => {
     vi.useFakeTimers({ toFake: ['Date', 'setInterval', 'clearInterval'] });
     vi.setSystemTime(new Date(2026, 9, 26, 12, 30));
     serverStatus.set(false);
+    serverVersion.set(undefined);
     authStatus.set(false);
     syncStatus.set('sync-disabled');
     lastSyncedAt.set(undefined);
@@ -25,7 +28,13 @@ describe('ConnectionStatusDetailsComponent', () => {
       providers: [
         {
           provide: ConnectionStatusService,
-          useValue: { serverStatus, authStatus, syncStatus, lastSyncedAt },
+          useValue: {
+            serverStatus,
+            serverVersion,
+            authStatus,
+            syncStatus,
+            lastSyncedAt,
+          },
         },
       ],
     }).compileComponents();
@@ -33,11 +42,13 @@ describe('ConnectionStatusDetailsComponent', () => {
     translate.setTranslation('fr', {
       workspace: {
         connection: {
+          lastSync: 'Dernière synchronisation',
+          neverSynced: 'Aucune synchronisation',
           syncDate: {
             justNow: 'à l’instant',
             todayAt: 'aujourd’hui à {{time}}',
             yesterdayAt: 'hier à {{time}}',
-            dateAt: '{{date}} à {{time}}',
+            onDate: 'le {{date}}',
           },
         },
       },
@@ -45,11 +56,13 @@ describe('ConnectionStatusDetailsComponent', () => {
     translate.setTranslation('en', {
       workspace: {
         connection: {
+          lastSync: 'Last synchronized',
+          neverSynced: 'No synchronization yet',
           syncDate: {
             justNow: 'just now',
             todayAt: 'today at {{time}}',
             yesterdayAt: 'yesterday at {{time}}',
-            dateAt: '{{date}} at {{time}}',
+            onDate: 'on {{date}}',
           },
         },
       },
@@ -105,9 +118,37 @@ describe('ConnectionStatusDetailsComponent', () => {
     }
   );
 
+  it('always shows the application version and shows the server version only once available', () => {
+    const root = fixture.nativeElement as HTMLElement;
+    const applicationVersion = root.querySelector(
+      `[aria-label="workspace.connection.applicationVersion v${version}"]`
+    );
+    expect(applicationVersion?.textContent).toContain(`v${version}`);
+    expect(applicationVersion?.querySelector('.lucide-monitor')).toBeTruthy();
+    expect(
+      root.querySelector('[aria-label^="workspace.connection.serverVersion"]')
+    ).toBeNull();
+    serverStatus.set(true);
+    serverVersion.set('1.2.3');
+    fixture.detectChanges();
+    const server = root.querySelector(
+      '[aria-label="workspace.connection.serverVersion v1.2.3"]'
+    );
+    expect(server?.textContent).toContain('v1.2.3');
+    expect(server?.querySelector('.lucide-server')).toBeTruthy();
+    expect(root.querySelectorAll('dl dd')).toHaveLength(3);
+    serverStatus.set(false);
+    serverVersion.set(undefined);
+    fixture.detectChanges();
+    expect(root.contains(server)).toBe(false);
+    expect(root.contains(applicationVersion)).toBe(true);
+  });
+
   it('shows a fallback before the first sync and preserves the exact datetime', () => {
     const root = fixture.nativeElement as HTMLElement;
-    expect(root.textContent).toContain('workspace.connection.neverSynced');
+    expect(root.querySelector('p')?.textContent?.trim()).toBe(
+      'Aucune synchronisation'
+    );
     const date = new Date(2026, 9, 26, 10, 30);
     lastSyncedAt.set(date);
     fixture.detectChanges();
@@ -122,6 +163,9 @@ describe('ConnectionStatusDetailsComponent', () => {
     expect(root.querySelector('time')?.textContent?.trim()).toBe(
       'today at 10:30'
     );
+    expect(
+      root.querySelector('p')?.textContent?.replace(/\s+/g, ' ').trim()
+    ).toBe('Last synchronized today at 10:30');
   });
 
   it.each([
@@ -143,8 +187,8 @@ describe('ConnectionStatusDetailsComponent', () => {
 
   it.each([
     [new Date(2026, 9, 25, 23, 50), 'hier à 23:50'],
-    [new Date(2026, 9, 24, 9, 15), 'il y a 2 jours · 24/10/2026 à 09:15'],
-    [new Date(2025, 11, 31, 9, 15), 'il y a 299 jours · 31/12/2025 à 09:15'],
+    [new Date(2026, 9, 24, 9, 15), 'le 24/10/2026'],
+    [new Date(2025, 11, 31, 9, 15), 'le 31/12/2025'],
   ])('uses local calendar days for %s', (date, expected) => {
     lastSyncedAt.set(date);
     fixture.detectChanges();
@@ -154,6 +198,24 @@ describe('ConnectionStatusDetailsComponent', () => {
         ?.textContent?.trim()
     ).toBe(expected);
   });
+
+  it.each([
+    [new Date(2026, 9, 26, 12, 25), 'Last synchronized 5 minutes ago'],
+    [new Date(2020, 9, 11), 'Last synchronized on 10/11/2020'],
+  ])(
+    'shows a natural English synchronization sentence for %s',
+    (date, expected) => {
+      TestBed.inject(TranslateService).use('en');
+      lastSyncedAt.set(date);
+      fixture.detectChanges();
+      expect(
+        (fixture.nativeElement as HTMLElement)
+          .querySelector('p')
+          ?.textContent?.replace(/\s+/g, ' ')
+          .trim()
+      ).toBe(expected);
+    }
+  );
 
   it('updates relative time while open and cancels the refresh timer on destruction', () => {
     lastSyncedAt.set(new Date(Date.now() - 59_000));

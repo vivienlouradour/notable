@@ -13,6 +13,9 @@ export class ConnectionStatusService {
   private readonly syncMetadataStore = inject(SyncMetadataStore);
 
   public readonly serverStatus = this.server.isConnected;
+  public readonly serverVersion = computed(() =>
+    this.serverStatus() ? this.server.version()?.version : undefined
+  );
   public readonly connectionChanged$ = this.server.connectionChanged$;
   public readonly authStatus = this.auth.isAuthenticated;
   public readonly syncStatus = computed<SyncStatus>(() => {
