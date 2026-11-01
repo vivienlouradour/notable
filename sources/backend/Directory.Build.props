@@ -1,0 +1,9 @@
+<Project>
+	<PropertyGroup>
+		<Version>0.0.1</Version>
+		<ManagePackageVersionsCentrally>True</ManagePackageVersionsCentrally>
+    <AnalysisLevel>latest</AnalysisLevel>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+</Project>

@@ -1,0 +1,111 @@
+<aside
+  class="flex min-h-0 flex-1 flex-col overflow-y-auto"
+  [attr.aria-label]="'workspace.documents' | translate">
+  <div class="flex min-h-12 shrink-0 items-center justify-between px-4">
+    <h2 class="text-xs font-semibold">
+      {{ 'workspace.documents' | translate }}
+    </h2>
+    <a
+      class="btn btn-ghost btn-square btn-sm text-base-content/75"
+      routerLink="/notes"
+      fragment="new-note"
+      [title]="'notes.new' | translate"
+      [attr.aria-label]="'notes.new' | translate">
+      <svg lucidePlus class="shrink-0 size-4" aria-hidden="true"></svg>
+    </a>
+  </div>
+  <div
+    class="input input-sm mx-3 mb-4 w-auto border-base-300 bg-transparent text-base-content/75 focus-within:outline-primary">
+    <svg lucideSearch class="shrink-0 size-4" aria-hidden="true"></svg>
+    <input
+      #searchInput
+      type="search"
+      class="placeholder:text-base-content/70 placeholder:opacity-100"
+      [placeholder]="'workspace.searchNotes' | translate"
+      [attr.aria-label]="'workspace.searchNotes' | translate"
+      [value]="query()"
+      (input)="query.set(searchInput.value)" />
+  </div>
+  <a class="flex items-center gap-2 px-4 py-2 text-xs" routerLink="/notes">
+    <svg
+      lucideChevronRight
+      class="shrink-0 size-4 rotate-90 text-base-content/75"
+      aria-hidden="true"></svg>
+    <svg
+      lucideNotebook
+      class="shrink-0 size-4 text-primary"
+      aria-hidden="true"></svg>
+    <span>{{ 'workspace.myNotebook' | translate }}</span>
+    <span class="ml-auto tabular-nums text-base-content/75">{{
+      notes().length
+    }}</span>
+  </a>
+  <ul class="menu menu-sm min-h-44 w-full flex-1 px-2 pb-6">
+    @for (note of filteredNotes(); track note.id) {
+      <li>
+        <a
+          class="my-0.5 gap-2 pl-8"
+          [routerLink]="['/notes', note.id]"
+          routerLinkActive="menu-active bg-primary/10 text-primary"
+          (click)="closeMobileSidebar()">
+          <svg
+            lucideFileText
+            class="shrink-0 size-4 text-base-content/75"
+            aria-hidden="true"></svg>
+          <span class="truncate">{{
+            note.title || ('notes.untitled' | translate)
+          }}</span>
+        </a>
+      </li>
+    } @empty {
+      <li class="pointer-events-none">
+        <p class="text-xs leading-relaxed text-base-content/75">
+          {{
+            (query() ? 'workspace.noResults' : 'workspace.noDocuments')
+              | translate
+          }}
+        </p>
+      </li>
+    }
+  </ul>
+  <section class="shrink-0 border-t border-base-300 pb-4" #tagsSection>
+    <div class="flex min-h-12 items-center justify-between px-4">
+      <h2 class="text-xs font-semibold">{{ 'workspace.tags' | translate }}</h2>
+      <span class="text-xs tabular-nums text-base-content/75">{{
+        tags().length
+      }}</span>
+    </div>
+    @for (tag of tags(); track tag) {
+      <div class="flex items-center gap-2 px-5 py-2 text-xs">
+        <svg
+          lucideTag
+          class="shrink-0 size-4 text-base-content/75"
+          aria-hidden="true"></svg
+        ><span>{{ tag }}</span>
+      </div>
+    } @empty {
+      <p class="px-4 text-xs leading-relaxed text-base-content/75">
+        {{ 'workspace.noTags' | translate }}
+      </p>
+    }
+  </section>
+  <div class="flex shrink-0 items-center gap-2 border-t border-base-300 p-3">
+    <div class="avatar avatar-placeholder">
+      <div class="w-8 rounded-field bg-primary/10 font-semibold text-primary">
+        <span>N</span>
+      </div>
+    </div>
+    <div class="flex flex-col gap-0.5 text-xs">
+      <strong class="font-medium">{{
+        'workspace.personal' | translate
+      }}</strong>
+      <span class="text-base-content/75">{{
+        'workspace.local' | translate
+      }}</span>
+    </div>
+    <svg
+      lucideCheck
+      class="shrink-0 size-4 ml-auto text-success"
+      aria-hidden="true"></svg>
+  </div>
+</aside>

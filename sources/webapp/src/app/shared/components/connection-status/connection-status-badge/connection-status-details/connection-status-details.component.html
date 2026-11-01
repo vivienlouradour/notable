@@ -1,0 +1,53 @@
+<div class="card-body gap-4 p-4 text-xs">
+  <h2 class="text-sm font-semibold">
+    {{ 'workspace.connection.details' | translate }}
+  </h2>
+  <dl class="flex flex-col gap-3 border-t border-base-300 pt-4">
+    @for (row of rows(); track row.label) {
+      <div class="flex items-center justify-between gap-3">
+        <dt class="flex shrink-0 items-center gap-2 text-base-content/75">
+          <svg [lucideIcon]="row.icon" [size]="15" aria-hidden="true"></svg>
+          {{ row.label | translate }}
+        </dt>
+        <dd class="flex min-w-0 items-center justify-end gap-1.5 text-right">
+          <span
+            class="inline-flex shrink-0"
+            [class.text-success]="row.color === 'success'"
+            [class.text-warning]="row.color === 'warning'"
+            [class.text-error]="row.color === 'error'"
+            [class.motion-safe:animate-spin]="row.spinning"
+            aria-hidden="true">
+            <svg
+              [lucideIcon]="row.statusIcon"
+              [size]="13"
+              aria-hidden="true"></svg>
+          </span>
+          {{ row.value | translate }}
+        </dd>
+      </div>
+    }
+  </dl>
+  <div
+    class="flex items-start gap-2 border-t border-base-300 pt-3 text-base-content/75">
+    <svg
+      lucideClock3
+      [size]="15"
+      class="mt-0.5 shrink-0"
+      aria-hidden="true"></svg>
+    <p class="min-w-0">
+      {{ ('workspace.connection.lastSync' | translate) + ': ' }}
+      @if (lastSync(); as lastSync) {
+        <time
+          [attr.datetime]="lastSync.iso"
+          class="font-medium text-base-content"
+          >{{ lastSync.label }}</time
+        >
+      } @else {
+        <span>{{ 'workspace.connection.neverSynced' | translate }}</span>
+      }
+    </p>
+  </div>
+  <p class="text-base-content/75">
+    {{ 'workspace.connection.localHint' | translate }}
+  </p>
+</div>

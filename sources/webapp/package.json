@@ -1,0 +1,53 @@
+{
+  "name": "notable",
+  "version": "0.0.0",
+  "scripts": {
+    "ng": "ng",
+    "start": "ng serve",
+    "build": "ng build",
+    "watch": "ng build --watch --configuration development",
+    "test": "ng test",
+    "lint": "ng lint",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "check": "npm run lint && npm run format:check && npm run build",
+    "api:generate": "nswag run nswag.json"
+  },
+  "private": true,
+  "dependencies": {
+    "@angular/common": "^22.2.1",
+    "@angular/compiler": "^22.2.1",
+    "@angular/core": "^22.2.1",
+    "@angular/forms": "^22.2.1",
+    "@angular/platform-browser": "^22.2.1",
+    "@angular/platform-browser-dynamic": "^22.2.1",
+    "@angular/router": "^22.2.1",
+    "@lucide/angular": "^1.61.0",
+    "@ngx-translate/core": "^16.0.4",
+    "@ngx-translate/http-loader": "^16.0.1",
+    "@tailwindcss/postcss": "^4.1.6",
+    "events": "^3.3.0",
+    "pouchdb-browser": "^9.0.0",
+    "rxjs": "~7.8.0",
+    "tailwindcss": "^4.1.6",
+    "tslib": "^2.3.0",
+    "zone.js": "~0.15.0"
+  },
+  "devDependencies": {
+    "@angular/build": "^22.2.1",
+    "@angular/cli": "^22.2.1",
+    "@angular/compiler-cli": "^22.2.1",
+    "@eslint/js": "^10.0.1",
+    "@types/pouchdb-browser": "^6.1.5",
+    "angular-eslint": "22.6.0",
+    "daisyui": "^5.0.35",
+    "eslint": "^10.12.0",
+    "jsdom": "^29.1.1",
+    "nswag": "^14.7.1",
+    "postcss": "^8.5.3",
+    "prettier": "^3.9.10",
+    "typescript": "~6.0.3",
+    "typescript-eslint": "8.71.0",
+    "vitest": "^5.0.0"
+  }
+}

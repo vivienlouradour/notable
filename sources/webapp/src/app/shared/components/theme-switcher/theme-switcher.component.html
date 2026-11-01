@@ -1,0 +1,17 @@
+<label class="flex min-h-10 cursor-pointer items-center gap-2">
+  <span
+    class="toggle toggle-xl rounded-full border-base-300 bg-base-200 text-primary before:rounded-full has-checked:bg-primary/10 motion-reduce:transition-none before:motion-reduce:transition-none [&>svg]:motion-reduce:transition-none">
+    <input
+      #themeToggle
+      type="checkbox"
+      role="switch"
+      [checked]="dark()"
+      (change)="setDark(themeToggle.checked)"
+      [attr.aria-label]="'shared.theme.darkMode' | translate" />
+    <svg lucideSun class="pointer-events-none" aria-hidden="true"></svg>
+    <svg lucideMoon class="pointer-events-none" aria-hidden="true"></svg>
+  </span>
+  <span class="text-xs text-base-content/60">{{
+    (dark() ? 'shared.theme.dark' : 'shared.theme.light') | translate
+  }}</span>
+</label>

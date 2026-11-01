@@ -1,0 +1,21 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Packages.props" />
+  </Folder>
+  <Folder Name="/Sources/">
+    <Project Path="Sources/Notable.Core/Notable.Core.csproj" />
+    <Project Path="Sources/Notable.CouchDb/Notable.CouchDb.csproj" />
+    <Project Path="Sources/Notable.Host/Notable.Host.csproj" />
+    <Project Path="Sources/Notable.Identity.Common/Notable.Identity.Common.csproj" />
+    <Project Path="Sources/Notable.Identity/Notable.Identity.csproj" />
+    <Project Path="Sources/Notable.Persistence/Notable.Persistence.csproj" />
+  </Folder>
+  <Folder Name="/Tests/">
+    <Project Path="Tests/Notable.Core.Tests/Notable.Core.Tests.csproj" />
+    <Project Path="Tests/Notable.CouchDb.Tests/Notable.CouchDb.Tests.csproj" />
+    <Project Path="Tests/Notable.Host.Tests/Notable.Host.Tests.csproj" />
+    <Project Path="Tests/Notable.Identity.Tests/Notable.Identity.Tests.csproj" />
+    <Project Path="Tests/Notable.Testing/Notable.Testing.csproj" />
+  </Folder>
+</Solution>

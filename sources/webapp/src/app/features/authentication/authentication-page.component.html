@@ -1,0 +1,287 @@
+<main class="grid min-h-dvh bg-base-100 lg:grid-cols-3">
+  <section
+    class="flex min-w-0 flex-col px-6 py-6 sm:px-10 lg:order-last lg:px-8 xl:px-12"
+    aria-labelledby="auth-title">
+    <div class="flex items-center justify-between gap-4">
+      <a routerLink="/notes" class="btn btn-ghost btn-sm gap-2">
+        <svg lucideArrowLeft class="shrink-0 size-4" aria-hidden="true"></svg
+        >{{ 'auth.backToNotes' | translate }}
+      </a>
+      <app-lang-switcher />
+    </div>
+    <div
+      class="mx-auto flex w-full max-w-sm flex-1 flex-col justify-center py-12">
+      <div class="mb-8">
+        <div
+          class="mb-6 flex size-12 items-center justify-center rounded-2xl bg-primary/10 text-2xl font-semibold text-primary"
+          aria-hidden="true">
+          N
+        </div>
+        <p class="mb-2 text-sm font-semibold tracking-widest text-primary">
+          NOTABLE
+        </p>
+        <h1 id="auth-title" class="text-3xl font-semibold tracking-tight">
+          {{
+            (session.user()
+              ? 'auth.account'
+              : registration()
+                ? 'auth.registerTitle'
+                : 'auth.loginTitle'
+            ) | translate
+          }}
+        </h1>
+        <p class="mt-3 text-sm leading-relaxed text-base-content/75">
+          {{
+            (session.user() ? 'auth.profileHint' : 'auth.subtitle') | translate
+          }}
+        </p>
+      </div>
+
+      @if (error()) {
+        <div class="alert alert-error mb-6 block text-sm" role="alert">
+          <p>{{ error() | translate }}</p>
+          @if (validationErrors().length) {
+            <ul class="mt-2 list-disc pl-4">
+              @for (message of validationErrors(); track $index) {
+                <li>{{ message }}</li>
+              }
+            </ul>
+          }
+        </div>
+      }
+
+      @if (session.user(); as user) {
+        <dl class="space-y-5 break-words">
+          <div>
+            <dt class="text-sm text-base-content/75">
+              {{ 'auth.email' | translate }}
+            </dt>
+            <dd class="mt-1 font-medium">{{ user.email || '—' }}</dd>
+          </div>
+          <div>
+            <dt class="text-sm text-base-content/75">
+              {{ 'auth.userId' | translate }}
+            </dt>
+            <dd class="mt-1 font-mono text-sm">{{ user.id || '—' }}</dd>
+          </div>
+        </dl>
+        @if (session.status() === 'unavailable') {
+          <p class="mt-4 text-sm text-base-content/75" role="status">
+            {{ 'auth.profileUnavailable' | translate }}
+          </p>
+        }
+        <button
+          type="button"
+          class="btn btn-outline mt-8 w-full"
+          [disabled]="pending()"
+          (click)="logout()">
+          {{ 'auth.logout' | translate }}
+        </button>
+      } @else if (session.status() === 'loading' || config.loading()) {
+        <p
+          class="flex items-center gap-3 text-sm text-base-content/75"
+          role="status">
+          <svg
+            lucideLoaderCircle
+            [size]="20"
+            class="shrink-0 motion-safe:animate-spin"
+            aria-hidden="true"></svg
+          >{{ 'auth.loading' | translate }}
+        </p>
+      } @else if (config.failed()) {
+        <div class="alert mb-4 block text-sm" role="alert">
+          {{ 'auth.methodsUnavailable' | translate }}
+        </div>
+        <button
+          type="button"
+          class="btn btn-outline w-full"
+          (click)="config.retry(); session.refresh()">
+          {{ 'auth.retry' | translate }}
+        </button>
+      } @else {
+        @if (registered()) {
+          <p class="alert alert-success mb-6 text-sm" role="status">
+            {{ 'auth.registered' | translate }}
+          </p>
+        }
+        @if (
+          config.methods()?.builtInMethodResponse?.enabled &&
+          (!registration() || canRegister())
+        ) {
+          <form [formGroup]="form" (ngSubmit)="submit()">
+            <fieldset class="fieldset gap-5 p-0" [disabled]="pending()">
+              <div>
+                <label
+                  for="auth-email"
+                  class="mb-2 block text-sm font-medium"
+                  >{{ 'auth.email' | translate }}</label
+                >
+                <input
+                  id="auth-email"
+                  type="email"
+                  class="input w-full"
+                  formControlName="email"
+                  autocomplete="username"
+                  required
+                  [attr.aria-invalid]="
+                    form.controls.email.touched && form.controls.email.invalid
+                  "
+                  [attr.aria-describedby]="
+                    form.controls.email.touched && form.controls.email.invalid
+                      ? 'email-error'
+                      : null
+                  " />
+                @if (
+                  form.controls.email.touched && form.controls.email.invalid
+                ) {
+                  <p id="email-error" class="mt-2 text-sm text-error">
+                    {{ 'auth.invalidEmail' | translate }}
+                  </p>
+                }
+              </div>
+              <div>
+                <label
+                  for="auth-password"
+                  class="mb-2 block text-sm font-medium"
+                  >{{ 'auth.password' | translate }}</label
+                >
+                <input
+                  id="auth-password"
+                  type="password"
+                  class="input w-full"
+                  formControlName="password"
+                  [autocomplete]="
+                    registration() ? 'new-password' : 'current-password'
+                  "
+                  required
+                  [attr.aria-invalid]="
+                    form.controls.password.touched &&
+                    form.controls.password.invalid
+                  "
+                  [attr.aria-describedby]="
+                    registration() ? 'password-hint' : null
+                  " />
+                @if (registration()) {
+                  <p
+                    id="password-hint"
+                    class="mt-2 text-xs leading-relaxed text-base-content/75">
+                    {{ 'auth.passwordHint' | translate }}
+                  </p>
+                }
+                @if (
+                  form.controls.password.touched &&
+                  form.controls.password.invalid
+                ) {
+                  <p class="mt-2 text-sm text-error">
+                    {{ 'auth.passwordRequired' | translate }}
+                  </p>
+                }
+              </div>
+              @if (registration()) {
+                <div>
+                  <label
+                    for="auth-confirm-password"
+                    class="mb-2 block text-sm font-medium"
+                    >{{ 'auth.confirmPassword' | translate }}</label
+                  >
+                  <input
+                    id="auth-confirm-password"
+                    type="password"
+                    class="input w-full"
+                    formControlName="confirmPassword"
+                    autocomplete="new-password"
+                    required />
+                </div>
+              }
+              <button
+                type="submit"
+                class="btn btn-primary mt-1 w-full"
+                [disabled]="pending()">
+                @if (pending()) {
+                  <svg
+                    lucideLoaderCircle
+                    [size]="20"
+                    class="shrink-0 motion-safe:animate-spin"
+                    aria-hidden="true"></svg>
+                }
+                {{
+                  (registration() ? 'auth.register' : 'auth.login') | translate
+                }}
+              </button>
+            </fieldset>
+          </form>
+        } @else if (registration()) {
+          <p class="alert text-sm" role="status">
+            {{ 'auth.registrationDisabled' | translate }}
+          </p>
+        }
+
+        @if (registration()) {
+          <p class="mt-6 text-center text-sm text-base-content/75">
+            <a routerLink="/login" class="link link-primary">{{
+              'auth.alreadyRegistered' | translate
+            }}</a>
+          </p>
+        } @else if (canRegister()) {
+          <p class="mt-6 text-center text-sm text-base-content/75">
+            {{ 'auth.noAccount' | translate }}
+            <a routerLink="/register" class="link link-primary">{{
+              'auth.register' | translate
+            }}</a>
+          </p>
+        }
+
+        @if (config.methods()?.oidcMethodResponse?.enabled) {
+          <p
+            class="mt-8 rounded-box border border-base-300 bg-base-200 p-4 text-sm leading-relaxed text-base-content/75"
+            role="status">
+            {{ 'auth.oidcPending' | translate }}
+          </p>
+        }
+        @if (
+          !config.methods()?.builtInMethodResponse?.enabled &&
+          !config.methods()?.oidcMethodResponse?.enabled
+        ) {
+          <p class="text-sm text-base-content/75" role="status">
+            {{ 'auth.noMethods' | translate }}
+          </p>
+        }
+      }
+      @if (session.status() === 'unavailable' && !config.failed()) {
+        <button
+          type="button"
+          class="btn btn-ghost btn-sm mt-4 self-start"
+          (click)="session.refresh()">
+          {{ 'auth.retry' | translate }}
+        </button>
+      }
+      <p class="mt-10 text-xs leading-relaxed text-base-content/75">
+        {{ 'auth.localHint' | translate }}
+      </p>
+    </div>
+  </section>
+  <aside
+    class="relative hidden overflow-hidden bg-linear-to-br from-base-200 via-primary/10 to-primary/25 lg:col-span-2 lg:flex lg:items-center lg:justify-center"
+    aria-hidden="true">
+    <div
+      class="absolute -top-32 -right-24 size-112 rounded-full border border-primary/10"></div>
+    <div
+      class="absolute -bottom-48 -left-24 size-144 rounded-full border border-primary/10"></div>
+    <div class="relative max-w-xl px-12 text-center">
+      <div
+        class="mx-auto mb-10 flex size-28 -rotate-6 items-center justify-center rounded-3xl border border-primary/15 bg-base-100/70 text-7xl font-semibold text-primary shadow-xl shadow-primary/5">
+        N
+      </div>
+      <p class="text-5xl font-semibold tracking-tight text-base-content">
+        Notable
+      </p>
+      <p
+        class="mx-auto mt-6 max-w-sm text-xl leading-relaxed text-base-content/75">
+        {{ 'auth.brandMessage' | translate }}
+      </p>
+      <p class="mt-12 text-sm tracking-wide text-base-content/75">
+        {{ 'auth.brandValues' | translate }}
+      </p>
+    </div>
+  </aside>
+</main>

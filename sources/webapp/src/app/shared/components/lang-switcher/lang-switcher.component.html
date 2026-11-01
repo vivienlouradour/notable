@@ -1,0 +1,18 @@
+<div class="relative">
+  <select
+    class="select select-sm w-full border-base-300 bg-base-200 bg-none text-xs open:bg-none"
+    (change)="switchLang($event)"
+    [attr.aria-label]="'workspace.language' | translate">
+    <option [selected]="selectedLang === 'en'" value="en">
+      {{ 'shared.language.en' | translate }}
+    </option>
+    <option [selected]="selectedLang === 'fr'" value="fr">
+      {{ 'shared.language.fr' | translate }}
+    </option>
+  </select>
+  <svg
+    lucideChevronDown
+    [size]="14"
+    class="pointer-events-none absolute end-3 top-1/2 -translate-y-1/2"
+    aria-hidden="true"></svg>
+</div>

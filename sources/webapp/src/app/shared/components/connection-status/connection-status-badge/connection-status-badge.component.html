@@ -1,0 +1,65 @@
+<button
+  type="button"
+  class="btn btn-ghost btn-xs min-w-0 gap-1.5 px-1 font-normal"
+  [attr.aria-label]="
+    ('workspace.connection.details' | translate) +
+    ' : ' +
+    (status().label | translate)
+  "
+  [attr.aria-expanded]="detailsOpen()"
+  [attr.aria-controls]="detailsOpen() ? detailsId : null"
+  [attr.aria-describedby]="detailsOpen() ? detailsId : null"
+  (click)="toggleDetails()">
+  <span class="flex min-w-0 items-center gap-1.5" role="status">
+    <span
+      class="inline-flex shrink-0"
+      [class.text-success]="status().color === 'success'"
+      [class.text-warning]="status().color === 'warning'"
+      [class.text-error]="status().color === 'error'"
+      [class.motion-safe:animate-spin]="status().spinning"
+      aria-hidden="true">
+      <svg [lucideIcon]="status().icon" [size]="14" aria-hidden="true"></svg>
+    </span>
+    <span class="truncate">{{ status().label | translate }}</span>
+  </span>
+  <svg
+    lucideChevronUp
+    [size]="12"
+    class="shrink-0 text-base-content/60"
+    aria-hidden="true"></svg>
+</button>
+
+@if (detailsOpen()) {
+  <div
+    class="absolute bottom-full left-0 z-50 w-80 max-w-[calc(100vw-1.5rem)] pb-2"
+    [id]="detailsId"
+    role="tooltip">
+    <app-connection-status-details />
+  </div>
+}
+
+@if (connectionAlert() !== null) {
+  <div class="toast toast-start bottom-9 z-50 max-w-[calc(100vw-1.5rem)]">
+    <div
+      class="alert flex gap-3 text-sm shadow-lg"
+      [class.alert-success]="connectionAlert()"
+      [class.alert-error]="!connectionAlert()"
+      [attr.role]="connectionAlert() ? 'status' : 'alert'">
+      <span>
+        {{
+          (connectionAlert()
+            ? 'workspace.connection.connectedAlert'
+            : 'workspace.connection.disconnectedAlert'
+          ) | translate
+        }}
+      </span>
+      <button
+        type="button"
+        class="btn btn-ghost btn-xs btn-square shrink-0"
+        [attr.aria-label]="'workspace.close' | translate"
+        (click)="dismissAlert()">
+        <svg lucideX class="shrink-0 size-4" aria-hidden="true"></svg>
+      </button>
+    </div>
+  </div>
+}

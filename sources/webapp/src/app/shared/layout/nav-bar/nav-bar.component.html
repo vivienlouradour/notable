@@ -1,0 +1,125 @@
+<div class="flex w-10 shrink-0 flex-col items-center sidebar:w-12">
+  <header class="flex h-10 shrink-0 items-center">
+    <a
+      class="btn btn-soft btn-primary btn-square btn-sm"
+      routerLink="/notes"
+      [title]="appName"
+      [attr.aria-label]="appName"
+      >N</a
+    >
+  </header>
+  <nav
+    class="flex min-h-0 flex-1 flex-col items-center gap-2 py-2"
+    [attr.aria-label]="'workspace.navigation' | translate">
+    <button
+      class="btn btn-soft btn-primary btn-square btn-sm"
+      (click)="sidebarOpen.set(!sidebarOpen())"
+      [title]="'workspace.documents' | translate"
+      [attr.aria-label]="'workspace.documents' | translate"
+      aria-controls="workspace-sidebar"
+      [attr.aria-expanded]="sidebarOpen()">
+      <svg lucideNotebook class="shrink-0 size-4" aria-hidden="true"></svg>
+    </button>
+    <button
+      class="btn btn-ghost btn-square btn-sm text-base-content/75"
+      (click)="openSearch(sidebar.searchInput().nativeElement)"
+      [title]="'workspace.search' | translate"
+      [attr.aria-label]="'workspace.search' | translate">
+      <svg lucideSearch class="shrink-0 size-4" aria-hidden="true"></svg>
+    </button>
+    <div class="my-0.5 w-5 border-t border-base-300"></div>
+    <button
+      class="btn btn-ghost btn-square btn-sm text-base-content/75"
+      (click)="
+        sidebarOpen.set(true);
+        sidebar
+          .tagsSection()
+          .nativeElement.scrollIntoView({ behavior: 'smooth' })
+      "
+      [title]="'workspace.tags' | translate"
+      [attr.aria-label]="'workspace.tags' | translate">
+      <svg lucideTag class="shrink-0 size-4" aria-hidden="true"></svg>
+    </button>
+    <div
+      class="dropdown dropdown-right dropdown-end z-30 mt-auto"
+      [class.dropdown-open]="settingsOpen()">
+      <button
+        class="btn btn-ghost btn-square btn-sm text-base-content/75"
+        (click)="settingsOpen.set(!settingsOpen())"
+        [title]="'workspace.preferences' | translate"
+        [attr.aria-label]="'workspace.preferences' | translate"
+        aria-controls="workspace-settings"
+        [attr.aria-expanded]="settingsOpen()">
+        <svg lucideSettings class="shrink-0 size-4" aria-hidden="true"></svg>
+      </button>
+      <section
+        id="workspace-settings"
+        class="dropdown-content card card-sm card-border ml-2 w-64 border-base-300 bg-base-100 shadow-xl"
+        [class.hidden]="!settingsOpen()"
+        [attr.aria-label]="'workspace.preferences' | translate">
+        <div class="card-body">
+          <div class="card-actions items-center justify-between">
+            <h2 class="card-title text-sm">
+              {{ 'workspace.preferences' | translate }}
+            </h2>
+            <button
+              class="btn btn-ghost btn-square btn-sm text-base-content/75"
+              (click)="settingsOpen.set(false)"
+              [attr.aria-label]="'workspace.close' | translate">
+              <svg lucideX class="shrink-0 size-4" aria-hidden="true"></svg>
+            </button>
+          </div>
+          <fieldset class="fieldset">
+            <legend class="fieldset-legend font-medium">
+              {{ 'workspace.appearance' | translate }}
+            </legend>
+            <app-theme-switcher />
+          </fieldset>
+          <fieldset class="fieldset">
+            <legend class="fieldset-legend font-medium">
+              {{ 'workspace.language' | translate }}
+            </legend>
+            <app-lang-switcher />
+          </fieldset>
+          <a
+            class="btn btn-outline btn-sm mt-2"
+            routerLink="/account"
+            (click)="settingsOpen.set(false)"
+            >{{ 'auth.account' | translate }}</a
+          >
+        </div>
+      </section>
+    </div>
+  </nav>
+</div>
+<div
+  class="drawer min-h-0 min-w-0 flex-1 pr-1.5 sidebar:pr-2"
+  [class]="sidebarOpen() ? 'sidebar:drawer-open' : ''">
+  <input
+    id="workspace-drawer"
+    type="checkbox"
+    class="drawer-toggle"
+    [checked]="sidebarOpen()"
+    tabindex="-1"
+    aria-hidden="true" />
+  <div class="drawer-content h-full min-h-0">
+    <ng-content />
+  </div>
+  <div id="workspace-sidebar" class="drawer-side z-20 sidebar:h-full">
+    <button
+      type="button"
+      class="drawer-overlay sidebar:hidden"
+      [attr.aria-label]="'workspace.close' | translate"
+      [attr.tabindex]="sidebarOpen() ? 0 : -1"
+      (click)="sidebarOpen.set(false)"></button>
+    <div
+      class="flex h-full w-64 flex-col bg-base-200 sidebar:mr-1.5 sidebar:rounded-box">
+      <a
+        class="flex h-10 shrink-0 items-center px-4 text-sm font-semibold"
+        routerLink="/notes"
+        >{{ appName }}</a
+      >
+      <app-side-bar #sidebar [(sidebarOpen)]="sidebarOpen" />
+    </div>
+  </div>
+</div>

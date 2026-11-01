@@ -1,0 +1,112 @@
+@if (note(); as note) {
+  <div
+    class="flex h-12 shrink-0 items-center justify-between gap-3 border-b border-base-300">
+    <div
+      class="breadcrumbs min-w-0 overflow-hidden py-0 text-xs text-base-content/75">
+      <ul>
+        <li>
+          <a
+            class="gap-2"
+            routerLink="/notes"
+            [attr.aria-label]="'workspace.allNotes' | translate">
+            <svg
+              lucideFileText
+              class="shrink-0 size-4 text-primary"
+              aria-hidden="true"></svg
+            >{{ 'workspace.myNotebook' | translate }}
+          </a>
+        </li>
+        <li class="min-w-0 text-base-content">
+          <span class="truncate">{{
+            note.title || ('notes.untitled' | translate)
+          }}</span>
+        </li>
+      </ul>
+    </div>
+    <div class="flex shrink-0 items-center gap-2">
+      <span class="hidden text-xs text-base-content/75 content:inline">{{
+        'notes.document' | translate
+      }}</span>
+      <button
+        class="btn btn-ghost btn-square btn-sm text-base-content/75 hover:text-error"
+        (click)="deleteNote()"
+        [title]="'notes.delete' | translate"
+        [attr.aria-label]="'notes.delete' | translate">
+        <svg lucideTrash2 class="shrink-0 size-4" aria-hidden="true"></svg>
+      </button>
+    </div>
+  </div>
+  <div class="flex flex-1 flex-col gap-5 py-5 content:pb-6">
+    <header
+      class="rounded-box border border-base-300 bg-base-200/60 p-4 content:p-5">
+      <textarea
+        class="textarea textarea-ghost field-sizing-content min-h-0 w-full min-w-0 resize-none border-0 p-0 text-3xl leading-normal font-semibold tracking-tight placeholder:text-base-content/70 focus-visible:outline-primary content:text-4xl"
+        rows="1"
+        [(ngModel)]="note.title"
+        (ngModelChange)="saved.set(false)"
+        [placeholder]="'notes.titlePlaceholder' | translate"
+        [attr.aria-label]="'notes.name' | translate"></textarea>
+      <div
+        class="mt-3 flex flex-wrap items-center gap-2 text-xs text-base-content/75">
+        <span
+          class="inline-flex items-center gap-1.5 rounded-field border border-base-300 bg-base-100 px-2 py-1">
+          <svg
+            lucideCalendarDays
+            class="size-3.5 shrink-0"
+            aria-hidden="true"></svg>
+          <span
+            >{{ 'notes.created' | translate }}
+            <time
+              [attr.datetime]="note.metadata.createdAt | date: 'yyyy-MM-dd'"
+              >{{ note.metadata.createdAt | date: 'dd MMM yyyy' }}</time
+            >
+          </span>
+        </span>
+        @for (tag of note.metadata.tags; track $index) {
+          <span class="badge badge-soft badge-primary badge-sm">{{ tag }}</span>
+        }
+      </div>
+    </header>
+    <div class="flex flex-1 flex-col rounded-box border border-base-300">
+      <textarea
+        class="textarea textarea-ghost min-h-80 w-full flex-1 resize-y rounded-t-box rounded-b-none border-0 p-4 text-base leading-loose placeholder:text-base-content/70 focus-visible:-outline-offset-2 focus-visible:outline-primary content:p-5"
+        [(ngModel)]="note.content"
+        (ngModelChange)="saved.set(false)"
+        [placeholder]="'notes.editorPlaceholder' | translate"
+        [attr.aria-label]="'notes.content' | translate"
+        spellcheck="true"></textarea>
+      <div
+        class="flex flex-wrap items-center justify-between gap-4 rounded-b-box border-t border-base-300 bg-base-200/60 px-4 py-3 content:px-5">
+        <span class="text-xs text-base-content/75">
+          {{ (note.content || '').length }} {{ 'notes.characters' | translate }}
+          <span class="px-2">·</span> {{ 'notes.plainText' | translate }}
+        </span>
+        <div class="flex items-center gap-3">
+          @if (saved()) {
+            <span
+              class="hidden items-center gap-1.5 text-xs text-success content:flex"
+              role="status">
+              <svg lucideCheck class="shrink-0 size-4" aria-hidden="true"></svg
+              >{{ 'notes.saved' | translate }}
+            </span>
+          }
+          <button class="btn btn-primary btn-sm" (click)="updateNote()">
+            <svg lucideCheck class="shrink-0 size-4" aria-hidden="true"></svg
+            >{{ 'notes.save' | translate }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+} @else {
+  <div class="flex flex-1 flex-col items-center justify-center gap-5 py-6">
+    <svg
+      lucideFileText
+      class="shrink-0 size-10 text-base-content/75"
+      aria-hidden="true"></svg>
+    <h1 class="text-lg">{{ 'notes.unavailable' | translate }}</h1>
+    <a class="btn btn-outline btn-sm" routerLink="/notes">{{
+      'workspace.allNotes' | translate
+    }}</a>
+  </div>
+}

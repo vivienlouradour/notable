@@ -1,0 +1,80 @@
+<div
+  class="flex h-12 items-center justify-between gap-3 border-b border-base-300">
+  <div
+    class="breadcrumbs min-w-0 overflow-hidden py-0 text-xs text-base-content/75">
+    <ul>
+      <li class="gap-2">
+        <svg lucideNotebook class="shrink-0 size-4" aria-hidden="true"></svg
+        >{{ 'workspace.myNotebook' | translate }}
+      </li>
+      <li class="text-base-content">{{ 'workspace.allNotes' | translate }}</li>
+    </ul>
+  </div>
+  <span class="shrink-0 text-xs text-base-content/75"
+    >{{ notes().length }} {{ 'workspace.documentsCount' | translate }}</span
+  >
+</div>
+<div class="py-8 content:py-9 wide:pt-12">
+  <div
+    class="mb-7 grid size-14 place-items-center rounded-box bg-primary/10 text-primary">
+    <svg lucideNotebook class="shrink-0 size-8" aria-hidden="true"></svg>
+  </div>
+  <h1 class="mb-2 text-3xl font-semibold tracking-tight content:text-4xl">
+    {{ 'workspace.allNotes' | translate }}
+  </h1>
+  <p class="text-sm leading-relaxed text-base-content/75">
+    {{ 'notes.description' | translate }}
+  </p>
+  <section class="mt-9" id="new-note">
+    <div class="mb-3 flex items-center gap-2">
+      <svg
+        lucidePlus
+        class="shrink-0 size-4 text-base-content/75"
+        aria-hidden="true"></svg>
+      <h2 class="text-sm font-semibold">{{ 'notes.new' | translate }}</h2>
+    </div>
+    <app-note-quick-create />
+  </section>
+  <section class="mt-9">
+    <div class="mb-3 flex items-center gap-2">
+      <svg
+        lucideFileText
+        class="shrink-0 size-4 text-base-content/75"
+        aria-hidden="true"></svg>
+      <h2 class="text-sm font-semibold">{{ 'notes.library' | translate }}</h2>
+      <span class="badge badge-ghost badge-xs">{{ notes().length }}</span>
+    </div>
+    <div class="border-t border-base-300">
+      <div class="flex justify-between px-4 py-3 text-xs text-base-content/75">
+        <span>{{ 'notes.name' | translate }}</span>
+        <span class="hidden pr-10 content:inline">{{
+          'notes.created' | translate
+        }}</span>
+      </div>
+      <ul class="list">
+        @for (note of notes(); track note.id) {
+          <li><app-note-preview [note]="note" /></li>
+        } @empty {
+          <li class="px-5 py-8 text-center">
+            <svg
+              lucideNotebook
+              class="shrink-0 mb-3 size-8 text-primary"
+              aria-hidden="true"></svg>
+            <h3 class="text-sm font-medium">{{ 'notes.empty' | translate }}</h3>
+            <p class="mt-2 text-xs text-base-content/75">
+              {{ 'notes.emptyHint' | translate }}
+            </p>
+          </li>
+        }
+      </ul>
+    </div>
+  </section>
+  <p
+    class="mt-8 flex items-center justify-center gap-2 text-xs text-base-content/75">
+    <svg
+      lucideCheck
+      class="shrink-0 size-4 text-success"
+      aria-hidden="true"></svg
+    >{{ 'notes.localHint' | translate }}
+  </p>
+</div>
