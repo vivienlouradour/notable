@@ -18,6 +18,7 @@ export default [
     useFactory: () => ({
       globalStatus: signal('offline'),
       serverStatus: signal(false),
+      serverVersion: signal(undefined),
       authStatus: signal(false),
       syncStatus: signal('sync-disabled'),
       lastSyncedAt: signal(undefined),
@@ -49,6 +50,7 @@ export default [
     provide: ServerStatusService,
     useFactory: () => ({
       isConnected: signal(false),
+      version: signal(undefined),
       connectionChanged$: EMPTY,
     }),
   },
