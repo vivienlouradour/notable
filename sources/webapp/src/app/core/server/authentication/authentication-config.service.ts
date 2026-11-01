@@ -1,4 +1,5 @@
-import { inject, Injectable, signal } from '@angular/core';
+import { DestroyRef, inject, Injectable, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { finalize, take, timeout } from 'rxjs';
 import { injectLogger } from '../../logger/logger';
 import {
@@ -9,6 +10,7 @@ import {
 @Injectable({ providedIn: 'root' })
 export class AuthenticationConfigService {
   private readonly authClient = inject(AuthClient);
+  private readonly destroyRef = inject(DestroyRef);
   private readonly logger = injectLogger('AuthenticationConfigService');
   private readonly _loading = signal(false);
   private readonly _failed = signal(false);
@@ -41,6 +43,7 @@ export class AuthenticationConfigService {
       .pipe(
         timeout(5_000),
         take(1),
+        takeUntilDestroyed(this.destroyRef),
         finalize(() => this._loading.set(false))
       )
       .subscribe({
