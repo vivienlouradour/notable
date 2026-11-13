@@ -19,6 +19,6 @@ internal class UserService(ICurrentUser currentUser, UserManager<ApplicationUser
 
     private static ApplicationUserDto Map(ApplicationUser user)
     {
-        return new ApplicationUserDto(user.Id, user.Email);
+        return new ApplicationUserDto(user.Id, user.Email, user.UserName);
     }
 }

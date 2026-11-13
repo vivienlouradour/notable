@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Routing;
@@ -30,11 +31,11 @@ internal static class BuiltInEndpoints
         return group;
     }
 
-    private static async Task<IResult> LoginAsync(LoginRequest request, SignInManager<ApplicationUser> signInManager, IOptions<AuthenticationOptions> options)
+    private static async Task<Results<Ok, UnauthorizedHttpResult, ProblemHttpResult>> LoginAsync(LoginRequest request, SignInManager<ApplicationUser> signInManager, IOptions<AuthenticationOptions> options)
     {
         if (!options.Value.BuiltIn.Enabled)
         {
-            return Results.Problem(
+            return TypedResults.Problem(
                 statusCode: StatusCodes.Status403Forbidden,
                 title: "Built-in authentication is disabled.");
         }
@@ -43,45 +44,45 @@ internal static class BuiltInEndpoints
 
         if (user is null)
         {
-            return Results.Unauthorized();
+            return TypedResults.Unauthorized();
         }
 
         var result = await signInManager.PasswordSignInAsync(user, request.Password, isPersistent: false, lockoutOnFailure: true);
 
         return result.Succeeded
-            ? Results.Ok()
-            : Results.Unauthorized();
+            ? TypedResults.Ok()
+            : TypedResults.Unauthorized();
     }
 
-    private static async Task<IResult> RegisterAsync(RegisterRequest request, TimeProvider timeProvider, UserManager<ApplicationUser> userManager, IOptions<AuthenticationOptions> options)
+    private static async Task<Results<Created<Guid>, ValidationProblem, ProblemHttpResult>> RegisterAsync(RegisterRequest request, TimeProvider timeProvider, UserManager<ApplicationUser> userManager, IOptions<AuthenticationOptions> options)
     {
         var builtIn = options.Value.BuiltIn;
         if (!builtIn.Enabled)
         {
-            return Results.Problem(
+            return TypedResults.Problem(
                 statusCode: StatusCodes.Status403Forbidden,
                 title: "Built-in authentication is disabled.");
         }
 
         if (!builtIn.AllowRegistration)
         {
-            return Results.Problem(
+            return TypedResults.Problem(
                 statusCode: StatusCodes.Status403Forbidden,
                 title: "Registration is disabled.");
         }
 
         var user = new ApplicationUser
         {
-            UserName = request.Email,
             Email = request.Email,
+            UserName = request.UserName,
             CreatedAt = timeProvider.GetUtcNow().DateTime
         };
 
         var result = await userManager.CreateAsync(user, request.Password);
 
-        if (!result.Succeeded)
-        {
-            return Results.ValidationProblem(
+        return result.Succeeded
+            ? TypedResults.Created($"/auth/users/{user.Id}", user.Id)
+            : TypedResults.ValidationProblem(
                 result.Errors
                     .GroupBy(error => error.Code)
                     .ToDictionary(
@@ -89,8 +90,7 @@ internal static class BuiltInEndpoints
                         group => group
                             .Select(error => error.Description)
                             .ToArray()));
-        }
-
-        return Results.Created($"/auth/users/{user.Id}", new { user.Id });
     }
 }
+
+internal sealed record RegisterRequest(string Email, string Password, string? UserName);
