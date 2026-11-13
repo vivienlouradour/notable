@@ -28,9 +28,6 @@ let nextDetailsId = 0;
   templateUrl: './connection-status-badge.component.html',
   host: {
     class: 'relative inline-flex min-w-0 items-center',
-    '(pointerenter)': 'onPointerEnter($event)',
-    '(pointerleave)': 'onPointerLeave()',
-    '(focusin)': 'onFocus()',
     '(focusout)': 'onFocusOut($event)',
     '(document:keydown.escape)': 'closeDetails()',
     '(document:click)': 'onDocumentClick($event)',
@@ -40,8 +37,6 @@ let nextDetailsId = 0;
 export class ConnectionStatusBadgeComponent {
   private readonly connectionStatusService = inject(ConnectionStatusService);
   private readonly element = inject<ElementRef<HTMLElement>>(ElementRef);
-  private pinned = false;
-  private focused = false;
 
   protected readonly detailsId = `connection-status-details-${nextDetailsId++}`;
   protected readonly detailsOpen = signal(false);
@@ -67,33 +62,14 @@ export class ConnectionStatusBadgeComponent {
     this.connectionAlert.set(null);
   }
 
-  protected onPointerEnter(event: PointerEvent): void {
-    if (event.pointerType !== 'touch') {
-      this.detailsOpen.set(true);
-    }
-  }
-
-  protected onPointerLeave(): void {
-    if (!this.pinned && !this.focused) {
-      this.detailsOpen.set(false);
-    }
-  }
-
-  protected onFocus(): void {
-    this.focused = true;
-    this.detailsOpen.set(true);
-  }
-
   protected onFocusOut(event: FocusEvent): void {
     if (!this.contains(event.relatedTarget)) {
-      this.focused = false;
       this.closeDetails();
     }
   }
 
   protected toggleDetails(): void {
-    this.pinned = !this.pinned;
-    this.detailsOpen.set(this.pinned);
+    this.detailsOpen.update(open => !open);
   }
 
   protected onDocumentClick(event: MouseEvent): void {
@@ -103,7 +79,6 @@ export class ConnectionStatusBadgeComponent {
   }
 
   protected closeDetails(): void {
-    this.pinned = false;
     this.detailsOpen.set(false);
   }
 
