@@ -1,0 +1,52 @@
+<button
+  #trigger
+  type="button"
+  class="btn btn-square btn-sm"
+  [class.btn-soft]="user()"
+  [class.btn-primary]="user()"
+  [class.btn-ghost]="!user()"
+  [class.text-base-content/75]="!user()"
+  [title]="label() | translate"
+  [attr.aria-label]="label() | translate"
+  [attr.aria-expanded]="user() ? open() : null"
+  [attr.aria-controls]="open() ? menuId : null"
+  [attr.aria-busy]="checkingSession()"
+  [disabled]="checkingSession()"
+  (click)="toggle()">
+  @if (initial()) {
+    <span aria-hidden="true">{{ initial() }}</span>
+  } @else {
+    <svg lucideCircleUserRound class="size-4 shrink-0" aria-hidden="true"></svg>
+  }
+</button>
+
+@if (open() && user()) {
+  <section
+    [id]="menuId"
+    class="absolute bottom-0 left-full ml-2 w-56 max-w-[calc(100vw-4rem)] rounded-box border border-base-300 bg-base-100 p-2 shadow-xl"
+    [attr.aria-label]="'auth.account' | translate"
+    [attr.aria-busy]="pending()">
+    <ul class="menu w-full p-0">
+      <li>
+        <button
+          type="button"
+          [attr.aria-disabled]="pending()"
+          [class.opacity-50]="pending()"
+          (click)="logout()">
+          <svg lucideLogOut class="size-4 shrink-0" aria-hidden="true"></svg>
+          {{ 'auth.logout' | translate }}
+          @if (pending()) {
+            <span
+              class="loading loading-spinner loading-xs"
+              aria-hidden="true"></span>
+          }
+        </button>
+      </li>
+    </ul>
+    @if (failed()) {
+      <p class="px-3 py-2 text-sm text-error" role="alert">
+        {{ 'auth.logoutFailed' | translate }}
+      </p>
+    }
+  </section>
+}

@@ -4,6 +4,11 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { AppComponent } from './app.component';
 import { AppLayoutComponent } from './shared/layout/workspace-layout/app-layout.component';
 import { provideRouter, Router } from '@angular/router';
+import { of } from 'rxjs';
+import {
+  AuthBuiltInClient,
+  AuthClient,
+} from './core/server/api/generated/api-client';
 
 describe('AppComponent', () => {
   let fixture: ComponentFixture<AppComponent>;
@@ -11,7 +16,11 @@ describe('AppComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [AppComponent],
-      providers: [provideRouter([{ path: '', component: AppLayoutComponent }])],
+      providers: [
+        provideRouter([{ path: '', component: AppLayoutComponent }]),
+        { provide: AuthClient, useValue: { me: () => of(null) } },
+        { provide: AuthBuiltInClient, useValue: {} },
+      ],
     }).compileComponents();
   });
 

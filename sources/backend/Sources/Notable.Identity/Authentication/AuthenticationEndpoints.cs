@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Options;
@@ -35,20 +36,22 @@ internal static class AuthenticationEndpoints
         return app;
     }
 
-    private static AuthenticationMethodsResponse GetAuthenticationMethods(IOptions<AuthenticationOptions> options)
+    private static Ok<AuthenticationMethodsResponse> GetAuthenticationMethods(IOptions<AuthenticationOptions> options)
     {
         var authOptions = options.Value;
-        return new AuthenticationMethodsResponse(
+        var response = new AuthenticationMethodsResponse(
                 new BuiltInMethodResponse(authOptions.BuiltIn.Enabled, authOptions.BuiltIn.Enabled && authOptions.BuiltIn.AllowRegistration),
                 new OidcMethodResponse(authOptions.Oidc.Enabled, authOptions.Oidc.DisplayName));
+        return TypedResults.Ok(response);
     }
 
-    private static async Task<ApplicationUserDto> GetCurrentUserAsync(UserService userService)
+    private static async Task<Ok<ApplicationUserDto>> GetCurrentUserAsync(UserService userService)
     {
-        return await userService.GetCurrentUserAsync();
+        var user = await userService.GetCurrentUserAsync();
+        return TypedResults.Ok(user);
     }
 
-    private static async Task<IResult> LogoutAsync(SignInManager<ApplicationUser> signInManager)
+    private static async Task<NoContent> LogoutAsync(SignInManager<ApplicationUser> signInManager)
     {
         await signInManager.SignOutAsync();
 
@@ -56,6 +59,6 @@ internal static class AuthenticationEndpoints
     }
 }
 
-public sealed record AuthenticationMethodsResponse(BuiltInMethodResponse BuiltInMethodResponse, OidcMethodResponse OidcMethodResponse);
-public sealed record BuiltInMethodResponse(bool Enabled, bool AllowRegistration);
-public sealed record OidcMethodResponse(bool Enabled, string DisplayName);
+internal sealed record AuthenticationMethodsResponse(BuiltInMethodResponse BuiltInMethodResponse, OidcMethodResponse OidcMethodResponse);
+internal sealed record BuiltInMethodResponse(bool Enabled, bool AllowRegistration);
+internal sealed record OidcMethodResponse(bool Enabled, string DisplayName);

@@ -68,22 +68,30 @@ describe('ConnectionStatusBadgeComponent', () => {
     }
   );
 
-  it('opens on hover, remains open over the details and closes on leaving', () => {
+  it('ignores hover and keeps clicked details open when the pointer leaves', () => {
     element.dispatchEvent(new MouseEvent('pointerenter'));
     fixture.detectChanges();
-    expect(element.querySelector('[role="tooltip"]')).toBeTruthy();
-    element
-      .querySelector('[role="tooltip"]')
-      ?.dispatchEvent(new MouseEvent('pointerenter'));
+    expect(element.querySelector('[role="tooltip"]')).toBeNull();
+    element.dispatchEvent(new MouseEvent('pointerleave'));
+    element.querySelector<HTMLButtonElement>('button')?.click();
     fixture.detectChanges();
     expect(element.querySelector('[role="tooltip"]')).toBeTruthy();
     element.dispatchEvent(new MouseEvent('pointerleave'));
     fixture.detectChanges();
-    expect(element.querySelector('[role="tooltip"]')).toBeNull();
+    expect(element.querySelector('[role="tooltip"]')).toBeTruthy();
   });
 
-  it('opens on keyboard focus, connects the description and dismisses on Escape', () => {
-    element.dispatchEvent(new FocusEvent('focusin'));
+  it('does not open just by focusing the button', () => {
+    element.querySelector<HTMLButtonElement>('button')?.focus();
+    fixture.detectChanges();
+    expect(element.querySelector('[role="tooltip"]')).toBeNull();
+    expect(element.querySelector('button')?.getAttribute('aria-expanded')).toBe(
+      'false'
+    );
+  });
+
+  it('opens on click, connects the description and dismisses on Escape', () => {
+    element.querySelector<HTMLButtonElement>('button')?.click();
     fixture.detectChanges();
     const button = element.querySelector('button');
     const tooltip = element.querySelector('[role="tooltip"]');
@@ -108,7 +116,9 @@ describe('ConnectionStatusBadgeComponent', () => {
     document.body.click();
     fixture.detectChanges();
     expect(element.querySelector('[role="tooltip"]')).toBeNull();
-    element.dispatchEvent(new FocusEvent('focusin'));
+    button?.click();
+    fixture.detectChanges();
+    expect(element.querySelector('[role="tooltip"]')).toBeTruthy();
     element.dispatchEvent(
       new FocusEvent('focusout', { relatedTarget: document.body })
     );
