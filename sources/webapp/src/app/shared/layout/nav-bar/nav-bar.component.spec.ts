@@ -2,6 +2,11 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { requiredElement } from '../../../../testing/note-fixtures';
 import { NavBarComponent } from './nav-bar.component';
+import { of } from 'rxjs';
+import {
+  AuthBuiltInClient,
+  AuthClient,
+} from '../../../core/server/api/generated/api-client';
 
 describe('NavBarComponent', () => {
   let fixture: ComponentFixture<NavBarComponent>;
@@ -10,6 +15,13 @@ describe('NavBarComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [NavBarComponent],
+      providers: [
+        {
+          provide: AuthClient,
+          useValue: { me: () => of({ email: 'user@example.com' }) },
+        },
+        { provide: AuthBuiltInClient, useValue: {} },
+      ],
     }).compileComponents();
   });
 
@@ -83,6 +95,42 @@ describe('NavBarComponent', () => {
     expect(
       requiredElement(root, '#workspace-settings').classList.contains('hidden')
     ).toBe(true);
+  });
+
+  it('places the account button after preferences and removes the old account link', async () => {
+    await render();
+    const nav = requiredElement(root, 'nav');
+    expect(nav.lastElementChild?.tagName).toBe('APP-ACCOUNT-MENU');
+    expect(
+      nav.lastElementChild?.previousElementSibling?.querySelector(
+        '#workspace-settings'
+      )
+    ).not.toBeNull();
+    expect(
+      root.querySelector('#workspace-settings a[href="/account"]')
+    ).toBeNull();
+  });
+
+  it('only opens one of the account and preferences panels at a time', async () => {
+    await render();
+    const settings = requiredElement<HTMLButtonElement>(
+      root,
+      'button[aria-controls="workspace-settings"]'
+    );
+    const account = requiredElement<HTMLButtonElement>(
+      root,
+      'app-account-menu > button'
+    );
+    settings.click();
+    await fixture.whenStable();
+    account.click();
+    await fixture.whenStable();
+    expect(settings.getAttribute('aria-expanded')).toBe('false');
+    expect(account.getAttribute('aria-expanded')).toBe('true');
+    settings.click();
+    await fixture.whenStable();
+    expect(settings.getAttribute('aria-expanded')).toBe('true');
+    expect(account.getAttribute('aria-expanded')).toBe('false');
   });
 
   it('opens the panel and focuses search on the next animation frame', async () => {
