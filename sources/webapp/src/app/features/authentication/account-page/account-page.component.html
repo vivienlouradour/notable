@@ -1,0 +1,68 @@
+<app-auth-layout titleKey="auth.account" subtitleKey="auth.profileHint">
+  @if (error()) {
+    <div class="alert alert-error mb-6 block text-sm" role="alert">
+      <p>{{ error() | translate }}</p>
+    </div>
+  }
+
+  @if (session.user(); as user) {
+    <dl class="space-y-5 break-words">
+      <div>
+        <dt class="text-sm text-base-content/75">
+          {{ 'auth.name' | translate }}
+        </dt>
+        <dd class="mt-1 font-medium">{{ user.name || '—' }}</dd>
+      </div>
+      <div>
+        <dt class="text-sm text-base-content/75">
+          {{ 'auth.email' | translate }}
+        </dt>
+        <dd class="mt-1 font-medium">{{ user.email || '—' }}</dd>
+      </div>
+      <div>
+        <dt class="text-sm text-base-content/75">
+          {{ 'auth.userId' | translate }}
+        </dt>
+        <dd class="mt-1 font-mono text-sm">{{ user.id || '—' }}</dd>
+      </div>
+    </dl>
+    @if (session.status() === 'unavailable') {
+      <p class="mt-4 text-sm text-base-content/75" role="status">
+        {{ 'auth.profileUnavailable' | translate }}
+      </p>
+    }
+    <button
+      type="button"
+      class="btn btn-outline mt-8 w-full"
+      [disabled]="pending()"
+      (click)="logout()">
+      {{ 'auth.logout' | translate }}
+    </button>
+  } @else if (session.status() === 'loading') {
+    <p
+      class="flex items-center gap-3 text-sm text-base-content/75"
+      role="status">
+      <svg
+        lucideLoaderCircle
+        [size]="20"
+        class="shrink-0 motion-safe:animate-spin"
+        aria-hidden="true"></svg
+      >{{ 'auth.loading' | translate }}
+    </p>
+  } @else if (session.status() === 'unavailable') {
+    <p class="alert block text-sm" role="alert">
+      {{ 'auth.profileUnavailable' | translate }}
+    </p>
+    <a routerLink="/login" class="link link-primary mt-4 inline-block">{{
+      'auth.login' | translate
+    }}</a>
+  }
+  @if (session.status() === 'unavailable') {
+    <button
+      type="button"
+      class="btn btn-ghost btn-sm mt-4 self-start"
+      (click)="session.refresh()">
+      {{ 'auth.retry' | translate }}
+    </button>
+  }
+</app-auth-layout>

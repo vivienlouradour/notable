@@ -4,14 +4,27 @@ import { NoteEditorComponent } from './features/notes/note-editor/note-editor.co
 import { AppLayoutComponent } from './shared/layout/workspace-layout/app-layout.component';
 
 export const routes: Routes = [
-  ...['login', 'register', 'account'].map(path => ({
-    path,
+  {
+    path: 'login',
     loadComponent: () =>
-      import('./features/authentication/authentication-page.component').then(
-        module => module.AuthenticationPageComponent
+      import('./features/authentication/login-page/login-page.component').then(
+        module => module.LoginPageComponent
       ),
-    data: { registration: path === 'register' },
-  })),
+  },
+  {
+    path: 'register',
+    loadComponent: () =>
+      import('./features/authentication/register-page/register-page.component').then(
+        module => module.RegisterPageComponent
+      ),
+  },
+  {
+    path: 'account',
+    loadComponent: () =>
+      import('./features/authentication/account-page/account-page.component').then(
+        module => module.AccountPageComponent
+      ),
+  },
   {
     path: '',
     component: AppLayoutComponent,

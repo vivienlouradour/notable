@@ -1,0 +1,136 @@
+<app-auth-layout titleKey="auth.loginTitle">
+  @if (error()) {
+    <div class="alert alert-error mb-6 block text-sm" role="alert">
+      <p>{{ error() | translate }}</p>
+    </div>
+  }
+
+  @if (session.status() === 'loading' || config.loading()) {
+    <p
+      class="flex items-center gap-3 text-sm text-base-content/75"
+      role="status">
+      <svg
+        lucideLoaderCircle
+        [size]="20"
+        class="shrink-0 motion-safe:animate-spin"
+        aria-hidden="true"></svg>
+      {{ 'auth.loading' | translate }}
+    </p>
+  } @else if (config.failed()) {
+    <div class="alert mb-4 block text-sm" role="alert">
+      {{ 'auth.methodsUnavailable' | translate }}
+    </div>
+    <button
+      type="button"
+      class="btn btn-outline w-full"
+      (click)="config.retry(); session.refresh()">
+      {{ 'auth.retry' | translate }}
+    </button>
+  } @else {
+    @if (registered()) {
+      <p class="alert alert-success mb-6 text-sm" role="status">
+        {{ 'auth.registered' | translate }}
+      </p>
+    }
+    @if (config.methods()?.builtInMethodResponse?.enabled) {
+      <form [formGroup]="form" (ngSubmit)="submit()">
+        <fieldset class="fieldset gap-5 p-0" [disabled]="pending()">
+          <div>
+            <label for="auth-email" class="mb-2 block text-sm font-medium">{{
+              'auth.email' | translate
+            }}</label>
+            <input
+              id="auth-email"
+              type="email"
+              class="input w-full"
+              formControlName="email"
+              autocomplete="username"
+              required
+              [attr.aria-invalid]="
+                form.controls.email.touched && form.controls.email.invalid
+              "
+              [attr.aria-describedby]="
+                form.controls.email.touched && form.controls.email.invalid
+                  ? 'email-error'
+                  : null
+              " />
+            @if (form.controls.email.touched && form.controls.email.invalid) {
+              <p id="email-error" class="mt-2 text-sm text-error">
+                {{ 'auth.invalidEmail' | translate }}
+              </p>
+            }
+          </div>
+          <div>
+            <label for="auth-password" class="mb-2 block text-sm font-medium">{{
+              'auth.password' | translate
+            }}</label>
+            <input
+              id="auth-password"
+              type="password"
+              class="input w-full"
+              formControlName="password"
+              autocomplete="current-password"
+              required
+              [attr.aria-invalid]="
+                form.controls.password.touched && form.controls.password.invalid
+              " />
+
+            @if (
+              form.controls.password.touched && form.controls.password.invalid
+            ) {
+              <p class="mt-2 text-sm text-error">
+                {{ 'auth.passwordRequired' | translate }}
+              </p>
+            }
+          </div>
+
+          <button
+            type="submit"
+            class="btn btn-primary mt-1 w-full"
+            [disabled]="pending()">
+            @if (pending()) {
+              <svg
+                lucideLoaderCircle
+                [size]="20"
+                class="shrink-0 motion-safe:animate-spin"
+                aria-hidden="true"></svg>
+            }
+            {{ 'auth.login' | translate }}
+          </button>
+        </fieldset>
+      </form>
+    }
+    @if (canRegister()) {
+      <p class="mt-6 text-center text-sm text-base-content/75">
+        {{ 'auth.noAccount' | translate }}
+        <a routerLink="/register" class="link link-primary">{{
+          'auth.register' | translate
+        }}</a>
+      </p>
+    }
+
+    @if (config.methods()?.oidcMethodResponse?.enabled) {
+      <p
+        class="mt-8 rounded-box border border-base-300 bg-base-200 p-4 text-sm leading-relaxed text-base-content/75"
+        role="status">
+        {{ 'auth.oidcPending' | translate }}
+      </p>
+    }
+    @if (
+      !config.methods()?.builtInMethodResponse?.enabled &&
+      !config.methods()?.oidcMethodResponse?.enabled
+    ) {
+      <p class="text-sm text-base-content/75" role="status">
+        {{ 'auth.noMethods' | translate }}
+      </p>
+    }
+  }
+  @if (session.status() === 'unavailable' && !config.failed()) {
+    <button
+      type="button"
+      class="btn btn-ghost btn-sm mt-4 self-start"
+      (click)="session.refresh()">
+      {{ 'auth.retry' | translate }}
+    </button>
+  }
+</app-auth-layout>
