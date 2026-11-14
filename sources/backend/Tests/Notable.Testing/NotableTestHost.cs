@@ -48,6 +48,7 @@ public class NotableTestHost : WebApplicationFactory<Program>
                 Id = user.Id,
                 Email = user.Email,
                 UserName = user.Email,
+                DisplayName = user.DisplayName,
             };
 
             var result = string.IsNullOrWhiteSpace(user.Password)

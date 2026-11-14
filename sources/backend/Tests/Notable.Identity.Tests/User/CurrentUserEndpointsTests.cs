@@ -14,16 +14,16 @@ namespace Notable.Identity.Tests.User;
 public sealed class CurrentUserEndpointsTests
 {
     [TestMethod]
-    [DataRow("current@example.com")]
-    [DataRow("Current+notes@Example.COM")]
-    public async Task GetMe_WithExistingUser_ReturnsOnlyPersistedPublicProfile(string email)
+    [DataRow("current@example.com", "Current User")]
+    [DataRow("Current+notes@Example.COM", "Élodie ✨")]
+    public async Task GetMe_WithExistingUser_ReturnsOnlyPersistedPublicProfile(string email, string displayName)
     {
         // Arrange
         using var couchDb = new StubCouchDbHandler();
         var userId = Guid.NewGuid();
         using var host = await NotableTestHostBuilder.Default
             .WithCouchDbHandler(couchDb)
-            .WithUsers(new TestUser(userId, email))
+            .WithUsers(new TestUser(userId, email, DisplayName: displayName))
             .BuildAsync();
 
         using var client = host.CreateAuthenticatedClient(userId);
@@ -37,7 +37,8 @@ public sealed class CurrentUserEndpointsTests
         (response.Content.Headers.ContentType?.MediaType).Should().Be("application/json");
         document.RootElement.GetProperty("id").GetGuid().Should().Be(userId);
         document.RootElement.GetProperty("email").GetString().Should().Be(email);
-        document.RootElement.EnumerateObject().Select(property => property.Name).Should().BeEquivalentTo(["id", "email"]);
+        document.RootElement.GetProperty("name").GetString().Should().Be(displayName);
+        document.RootElement.EnumerateObject().Select(property => property.Name).Should().BeEquivalentTo(["id", "email", "name"]);
         response.Headers.Location.Should().BeNull();
         response.Headers.Contains("Set-Cookie").Should().BeFalse();
         couchDb.Requests.Should().BeEmpty();
@@ -102,7 +103,8 @@ public sealed class CurrentUserEndpointsTests
         var secondUserId = Guid.NewGuid();
         using var host = await NotableTestHostBuilder.Default
             .WithCouchDbHandler(couchDb)
-            .WithUsers(new TestUser(firstUserId, "first@example.com"), new TestUser(secondUserId, "second@example.com"))
+            .WithUsers(new TestUser(firstUserId, "first@example.com", DisplayName: "First User"),
+                new TestUser(secondUserId, "second@example.com", DisplayName: "Second User"))
             .BuildAsync();
         host.Services.GetRequiredService<IOptions<AuthenticationOptions>>().Value.BuiltIn.Enabled = builtInEnabled;
         using var firstClient = host.CreateAuthenticatedClient(firstUserId);
@@ -120,9 +122,11 @@ public sealed class CurrentUserEndpointsTests
         firstResponse.StatusCode.Should().Be(HttpStatusCode.OK);
         firstProfile.RootElement.GetProperty("id").GetGuid().Should().Be(firstUserId);
         firstProfile.RootElement.GetProperty("email").GetString().Should().Be("first@example.com");
+        firstProfile.RootElement.GetProperty("name").GetString().Should().Be("First User");
         secondResponse.StatusCode.Should().Be(HttpStatusCode.OK);
         secondProfile.RootElement.GetProperty("id").GetGuid().Should().Be(secondUserId);
         secondProfile.RootElement.GetProperty("email").GetString().Should().Be("second@example.com");
+        secondProfile.RootElement.GetProperty("name").GetString().Should().Be("Second User");
         anonymousResponse.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
         anonymousResponse.Headers.Location.Should().BeNull();
         couchDb.Requests.Should().BeEmpty();
