@@ -62,6 +62,6 @@ describe('Session credentials', () => {
       new Blob(['{"id":"user-id"}'], { type: 'application/json' }),
       { status: 201, statusText: 'Created' }
     );
-    await expect(result).resolves.toBeUndefined();
+    await expect(result).resolves.toBeNull();
   });
 });

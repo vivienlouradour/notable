@@ -45,7 +45,7 @@
       [class.dropdown-open]="settingsOpen()">
       <button
         class="btn btn-ghost btn-square btn-sm text-base-content/75"
-        (click)="settingsOpen.set(!settingsOpen())"
+        (click)="toggleSettings()"
         [title]="'workspace.preferences' | translate"
         [attr.aria-label]="'workspace.preferences' | translate"
         aria-controls="workspace-settings"
@@ -54,7 +54,7 @@
       </button>
       <section
         id="workspace-settings"
-        class="dropdown-content card card-sm card-border ml-2 w-64 border-base-300 bg-base-100 shadow-xl"
+        class="dropdown-content card card-sm card-border ml-2 w-64 border-base-300 bg-base-100 shadow-xl transition-none"
         [class.hidden]="!settingsOpen()"
         [attr.aria-label]="'workspace.preferences' | translate">
         <div class="card-body">
@@ -81,15 +81,12 @@
             </legend>
             <app-lang-switcher />
           </fieldset>
-          <a
-            class="btn btn-outline btn-sm mt-2"
-            routerLink="/account"
-            (click)="settingsOpen.set(false)"
-            >{{ 'auth.account' | translate }}</a
-          >
         </div>
       </section>
     </div>
+    <app-account-menu
+      [open]="accountOpen()"
+      (openChange)="onAccountOpenChange($event)" />
   </nav>
 </div>
 <div
@@ -105,7 +102,9 @@
   <div class="drawer-content h-full min-h-0">
     <ng-content />
   </div>
-  <div id="workspace-sidebar" class="drawer-side z-20 sidebar:h-full">
+  <div
+    id="workspace-sidebar"
+    class="drawer-side z-20 max-sidebar:start-10 max-sidebar:w-[calc(100%-2.5rem)] sidebar:h-full">
     <button
       type="button"
       class="drawer-overlay sidebar:hidden"

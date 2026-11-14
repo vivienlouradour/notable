@@ -71,6 +71,8 @@
     "registerTitle": "Create your account",
     "subtitle": "Sign in to your personal space.",
     "profileHint": "Your personal information, in read-only mode.",
+    "name": "Name",
+    "nameRequired": "Enter your name.",
     "email": "Email address",
     "password": "Password",
     "confirmPassword": "Confirm password",

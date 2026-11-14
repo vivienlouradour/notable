@@ -41,7 +41,7 @@ public sealed class RegisterEndpointsTests
         using var client = authenticated ? host.CreateAuthenticatedClient(userId) : host.CreateUnauthenticatedClient();
 
         // Act
-        using var response = await client.PostAsJsonAsync("/auth/builtin/register", new { email = "new@example.com", Password });
+        using var response = await client.PostAsJsonAsync("/auth/builtin/register", new { email = "new@example.com", userName = "New User", Password });
         var body = await response.Content.ReadAsStringAsync();
         using var json = JsonDocument.Parse(body);
         using var scope = host.Services.CreateScope();
@@ -61,7 +61,9 @@ public sealed class RegisterEndpointsTests
     }
 
     [TestMethod]
-    public async Task Register_WithValidCredentials_PersistsUserAndReturnsOnlyId()
+    [DataRow("New User")]
+    [DataRow("Élodie ✨")]
+    public async Task Register_WithValidCredentials_PersistsUserAndReturnsOnlyId(string displayName)
     {
         // Arrange
         using var couchDb = new StubCouchDbHandler();
@@ -71,7 +73,7 @@ public sealed class RegisterEndpointsTests
         var before = DateTime.UtcNow;
 
         // Act
-        using var response = await client.PostAsJsonAsync("/auth/builtin/register", new { email = "new@example.com", Password });
+        using var response = await client.PostAsJsonAsync("/auth/builtin/register", new { email = "new@example.com", userName = displayName, Password });
         using var json = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
         using var scope = host.Services.CreateScope();
         var user = await scope.ServiceProvider.GetRequiredService<IdentityDbContext>().Users.SingleAsync();
@@ -81,10 +83,11 @@ public sealed class RegisterEndpointsTests
         response.StatusCode.Should().Be(HttpStatusCode.Created);
         response.Headers.Location.Should().Be(new Uri($"/auth/users/{user.Id}", UriKind.Relative));
         (response.Content.Headers.ContentType?.MediaType).Should().Be("application/json");
-        json.RootElement.EnumerateObject().Select(property => property.Name).Should().Equal("id");
-        json.RootElement.GetProperty("id").GetGuid().Should().Be(user.Id).And.NotBeEmpty();
+        json.RootElement.ValueKind.Should().Be(JsonValueKind.String);
+        json.RootElement.GetGuid().Should().Be(user.Id).And.NotBeEmpty();
         user.Email.Should().Be("new@example.com");
         user.UserName.Should().Be("new@example.com");
+        user.DisplayName.Should().Be(displayName);
         user.NormalizedEmail.Should().Be("NEW@EXAMPLE.COM");
         user.CreatedAt.Should().BeOnOrAfter(before).And.BeOnOrBefore(DateTime.UtcNow);
         user.PasswordHash.Should().NotBeNullOrWhiteSpace().And.NotBe(Password);
@@ -110,7 +113,7 @@ public sealed class RegisterEndpointsTests
         using var client = host.CreateUnauthenticatedClient();
 
         // Act
-        using var response = await client.PostAsJsonAsync("/auth/builtin/register", new { email, password });
+        using var response = await client.PostAsJsonAsync("/auth/builtin/register", new { email, password, userName = "New User" });
         using var json = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
         using var scope = host.Services.CreateScope();
         var count = await scope.ServiceProvider.GetRequiredService<IdentityDbContext>().Users.CountAsync();
@@ -133,11 +136,11 @@ public sealed class RegisterEndpointsTests
         using var couchDb = new StubCouchDbHandler();
         using var host = NotableTestHostBuilder.Default.WithCouchDbHandler(couchDb).WithBuiltInAuthentication(true, true).Build();
         using var client = host.CreateUnauthenticatedClient();
-        using var first = await client.PostAsJsonAsync("/auth/builtin/register", new { email = "existing@example.com", Password });
+        using var first = await client.PostAsJsonAsync("/auth/builtin/register", new { email = "existing@example.com", userName = "existingUser", Password });
         using var firstJson = JsonDocument.Parse(await first.Content.ReadAsStringAsync());
 
         // Act
-        using var response = await client.PostAsJsonAsync("/auth/builtin/register", new { email = "EXISTING@EXAMPLE.COM", Password });
+        using var response = await client.PostAsJsonAsync("/auth/builtin/register", new { email = "EXISTING@EXAMPLE.COM", userName = "existingUser", Password });
         using var json = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
         using var scope = host.Services.CreateScope();
         var users = await scope.ServiceProvider.GetRequiredService<IdentityDbContext>().Users.ToListAsync();
@@ -147,8 +150,76 @@ public sealed class RegisterEndpointsTests
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         json.RootElement.GetProperty("errors").EnumerateObject().Select(property => property.Name)
             .Should().Contain("DuplicateEmail").And.Contain("DuplicateUserName");
-        users.Should().ContainSingle().Which.Id.Should().Be(firstJson.RootElement.GetProperty("id").GetGuid());
+        users.Should().ContainSingle().Which.Id.Should().Be(firstJson.RootElement.GetGuid());
         response.Headers.Contains("Set-Cookie").Should().BeFalse();
+        couchDb.Requests.Should().BeEmpty();
+    }
+
+    [TestMethod]
+    [DataRow(null)]
+    [DataRow("")]
+    [DataRow("   ")]
+    [DataRow("\t\r\n")]
+    public async Task Register_WithInvalidDisplayName_ReturnsValidationProblemWithoutCreatingUser(string? displayName)
+    {
+        // Arrange
+        using var couchDb = new StubCouchDbHandler();
+        using var host = NotableTestHostBuilder.Default.WithCouchDbHandler(couchDb)
+            .WithBuiltInAuthentication(true, true).Build();
+        using var client = host.CreateUnauthenticatedClient();
+
+        // Act
+        using var response = await client.PostAsJsonAsync("/auth/builtin/register",
+            new { email = "new@example.com", Password, userName = displayName });
+        using var json = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+        using var scope = host.Services.CreateScope();
+        var count = await scope.ServiceProvider.GetRequiredService<IdentityDbContext>().Users.CountAsync();
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        (response.Content.Headers.ContentType?.MediaType).Should().Be("application/problem+json");
+        json.RootElement.GetProperty("errors").GetProperty("UserName").EnumerateArray().Should().NotBeEmpty();
+        count.Should().Be(0);
+        response.Headers.Location.Should().BeNull();
+        response.Headers.Contains("Set-Cookie").Should().BeFalse();
+        couchDb.Requests.Should().BeEmpty();
+    }
+
+    [TestMethod]
+    public async Task Register_WithSameDisplayName_AllowsDifferentEmailsAndEmailLogin()
+    {
+        // Arrange
+        using var couchDb = new StubCouchDbHandler();
+        using var host = NotableTestHostBuilder.Default.WithCouchDbHandler(couchDb)
+            .WithBuiltInAuthentication(true, true).Build();
+        using var firstClient = host.CreateUnauthenticatedClient();
+        using var secondClient = host.CreateUnauthenticatedClient();
+        const string displayName = "Same Display Name";
+
+        // Act
+        using var first = await firstClient.PostAsJsonAsync("/auth/builtin/register",
+            new { email = "first@example.com", Password, userName = displayName });
+        using var second = await secondClient.PostAsJsonAsync("/auth/builtin/register",
+            new { email = "second@example.com", Password, userName = displayName });
+        using var firstLogin = await firstClient.PostAsJsonAsync("/auth/builtin/login",
+            new { email = "FIRST@EXAMPLE.COM", Password });
+        using var secondLogin = await secondClient.PostAsJsonAsync("/auth/builtin/login",
+            new { email = "second@example.com", Password });
+        using var scope = host.Services.CreateScope();
+        var users = await scope.ServiceProvider.GetRequiredService<IdentityDbContext>().Users.ToListAsync();
+
+        // Assert
+        first.StatusCode.Should().Be(HttpStatusCode.Created);
+        second.StatusCode.Should().Be(HttpStatusCode.Created);
+        var firstId = await first.Content.ReadFromJsonAsync<Guid>();
+        var secondId = await second.Content.ReadFromJsonAsync<Guid>();
+        firstId.Should().NotBeEmpty().And.NotBe(secondId);
+        users.Should().HaveCount(2).And.OnlyContain(user => user.DisplayName == displayName);
+        users.Select(user => user.UserName).Should().BeEquivalentTo(["first@example.com", "second@example.com"]);
+        firstLogin.StatusCode.Should().Be(HttpStatusCode.OK);
+        secondLogin.StatusCode.Should().Be(HttpStatusCode.OK);
+        firstLogin.Headers.GetValues("Set-Cookie").Should().ContainSingle();
+        secondLogin.Headers.GetValues("Set-Cookie").Should().ContainSingle();
         couchDb.Requests.Should().BeEmpty();
     }
 
@@ -158,6 +229,11 @@ public sealed class RegisterEndpointsTests
     [DataRow("null", "application/json", 400)]
     [DataRow("{\"email\":\"user@example.com\"}", "application/json", 400)]
     [DataRow("{\"password\":\"Valid-password1!\"}", "application/json", 400)]
+    [DataRow("{\"email\":\"user@example.com\",\"password\":\"Valid-password1!\"}", "application/json", 400)]
+    [DataRow("{\"email\":\"user@example.com\",\"userName\":\"New User\"}", "application/json", 400)]
+    [DataRow("{\"password\":\"Valid-password1!\",\"userName\":\"New User\"}", "application/json", 400)]
+    [DataRow("{\"email\":\"user@example.com\",\"password\":null,\"userName\":\"New User\"}", "application/json", 400)]
+    [DataRow("{\"email\":null,\"password\":\"Valid-password1!\",\"userName\":\"New User\"}", "application/json", 400)]
     [DataRow("{}", "text/plain", 415)]
     public async Task Register_WithInvalidPayload_RejectsWithoutCreatingUser(string payload, string contentType, int status)
     {
