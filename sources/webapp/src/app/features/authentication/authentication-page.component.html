@@ -54,6 +54,12 @@
         <dl class="space-y-5 break-words">
           <div>
             <dt class="text-sm text-base-content/75">
+              {{ 'auth.name' | translate }}
+            </dt>
+            <dd class="mt-1 font-medium">{{ user.name || '—' }}</dd>
+          </div>
+          <div>
+            <dt class="text-sm text-base-content/75">
               {{ 'auth.email' | translate }}
             </dt>
             <dd class="mt-1 font-medium">{{ user.email || '—' }}</dd>
@@ -110,6 +116,37 @@
         ) {
           <form [formGroup]="form" (ngSubmit)="submit()">
             <fieldset class="fieldset gap-5 p-0" [disabled]="pending()">
+              @if (registration()) {
+                <div>
+                  <label
+                    for="auth-name"
+                    class="mb-2 block text-sm font-medium"
+                    >{{ 'auth.name' | translate }}</label
+                  >
+                  <input
+                    id="auth-name"
+                    type="text"
+                    class="input w-full"
+                    formControlName="name"
+                    autocomplete="name"
+                    required
+                    [attr.aria-invalid]="
+                      form.controls.name.touched && form.controls.name.invalid
+                    "
+                    [attr.aria-describedby]="
+                      form.controls.name.touched && form.controls.name.invalid
+                        ? 'name-error'
+                        : null
+                    " />
+                  @if (
+                    form.controls.name.touched && form.controls.name.invalid
+                  ) {
+                    <p id="name-error" class="mt-2 text-sm text-error">
+                      {{ 'auth.nameRequired' | translate }}
+                    </p>
+                  }
+                </div>
+              }
               <div>
                 <label
                   for="auth-email"
@@ -121,7 +158,7 @@
                   type="email"
                   class="input w-full"
                   formControlName="email"
-                  autocomplete="username"
+                  [autocomplete]="registration() ? 'email' : 'username'"
                   required
                   [attr.aria-invalid]="
                     form.controls.email.touched && form.controls.email.invalid

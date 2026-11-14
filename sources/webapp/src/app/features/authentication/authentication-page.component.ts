@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  effect,
   inject,
   signal,
 } from '@angular/core';
@@ -58,6 +59,7 @@ export class AuthenticationPageComponent {
   protected readonly error = signal('');
   protected readonly validationErrors = signal<string[]>([]);
   protected readonly form = inject(FormBuilder).nonNullable.group({
+    name: [''],
     email: ['', [Validators.required, Validators.email]],
     password: ['', Validators.required],
     confirmPassword: [''],
@@ -66,6 +68,14 @@ export class AuthenticationPageComponent {
 
   constructor() {
     if (this.session.status() !== 'loading') this.session.refresh();
+    effect(() => {
+      this.form.controls.name.setValidators(
+        this.registration()
+          ? [Validators.required, Validators.pattern(/\S/)]
+          : []
+      );
+      this.form.controls.name.updateValueAndValidity({ emitEvent: false });
+    });
   }
 
   protected submit(): void {
@@ -79,14 +89,18 @@ export class AuthenticationPageComponent {
     if (this.form.invalid) return;
     if (this.registration() && !this.canRegister()) return;
     if (!this.config.methods()?.builtInMethodResponse?.enabled) return;
-    const { email, password, confirmPassword } = this.form.getRawValue();
+    const { name, email, password, confirmPassword } = this.form.getRawValue();
     if (this.registration() && password !== confirmPassword) {
       this.error.set('auth.passwordMismatch');
       return;
     }
     this.pending.set(true);
     const operation: Observable<unknown> = this.registration()
-      ? this.session.register({ email: email.trim(), password })
+      ? this.session.register({
+          email: email.trim(),
+          password,
+          userName: name.trim(),
+        })
       : this.session.login({ email: email.trim(), password });
     operation
       .pipe(

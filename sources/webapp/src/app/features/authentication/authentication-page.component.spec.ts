@@ -92,6 +92,49 @@ describe('AuthenticationPageComponent', () => {
     fill('#auth-password', 'Example-password1!');
   }
 
+  function fillRegistration(name = 'Example User') {
+    fillCredentials();
+    fill('#auth-name', name);
+    fill('#auth-confirm-password', 'Example-password1!');
+  }
+
+  it('shows the accessible name field only during registration', async () => {
+    await render('/login');
+    expect(root.querySelector('#auth-name')).toBeNull();
+    await harness.navigateByUrl('/register');
+    const registrationRoot = harness.routeNativeElement;
+    if (!registrationRoot) throw new Error('Registration did not render');
+    const input = requiredElement<HTMLInputElement>(
+      registrationRoot,
+      '#auth-name'
+    );
+    expect(input.required).toBe(true);
+    expect(input.autocomplete).toBe('name');
+    expect(
+      registrationRoot.querySelector('label[for="auth-name"]')?.textContent
+    ).toContain('auth.name');
+    expect(
+      requiredElement<HTMLInputElement>(registrationRoot, '#auth-email')
+        .autocomplete
+    ).toBe('email');
+  });
+
+  it.each(['', '   ', '\t\n'])(
+    'rejects a blank registration name (%j) before calling the server',
+    async name => {
+      await render('/register');
+      fillRegistration(name);
+      await submit();
+      const input = requiredElement<HTMLInputElement>(root, '#auth-name');
+      expect(input.getAttribute('aria-invalid')).toBe('true');
+      expect(input.getAttribute('aria-describedby')).toBe('name-error');
+      expect(root.querySelector('#name-error')?.textContent).toContain(
+        'auth.nameRequired'
+      );
+      expect(session.register).not.toHaveBeenCalled();
+    }
+  );
+
   it.each([true, false])(
     'shows the built-in form only when enabled (%s)',
     async enabled => {
@@ -165,6 +208,10 @@ describe('AuthenticationPageComponent', () => {
     ).toBe(true);
     await submit();
     expect(session.login).toHaveBeenCalledOnce();
+    expect(session.login).toHaveBeenCalledWith({
+      email: profile.email,
+      password: 'Example-password1!',
+    });
     response.next(profile);
     response.complete();
     await harness.fixture.whenStable();
@@ -193,28 +240,31 @@ describe('AuthenticationPageComponent', () => {
 
   it('requires matching passwords at registration', async () => {
     await render('/register');
-    fillCredentials();
+    fillRegistration();
     fill('#auth-confirm-password', 'Different-password1!');
     await submit();
     expect(root.textContent).toContain('auth.passwordMismatch');
     expect(session.register).not.toHaveBeenCalled();
   });
 
-  it('returns to login with a success message after registration', async () => {
-    await render('/register');
-    fillCredentials();
-    fill('#auth-confirm-password', 'Example-password1!');
-    await submit();
-    expect(session.register).toHaveBeenCalledWith({
-      email: profile.email,
-      password: 'Example-password1!',
-    });
-    expect(session.login).not.toHaveBeenCalled();
-    expect(TestBed.inject(Router).url).toBe('/login?registered=true');
-    expect(harness.routeNativeElement?.textContent).toContain(
-      'auth.registered'
-    );
-  });
+  it.each(['Example User', '  Élodie ✨  '])(
+    'submits the trimmed display name and returns to login after registration (%s)',
+    async name => {
+      await render('/register');
+      fillRegistration(name);
+      await submit();
+      expect(session.register).toHaveBeenCalledWith({
+        email: profile.email,
+        password: 'Example-password1!',
+        userName: name.trim(),
+      });
+      expect(session.login).not.toHaveBeenCalled();
+      expect(TestBed.inject(Router).url).toBe('/login?registered=true');
+      expect(harness.routeNativeElement?.textContent).toContain(
+        'auth.registered'
+      );
+    }
+  );
 
   it('shows server validation errors as text and tolerates malformed responses', async () => {
     session.register.mockReturnValue(
@@ -235,13 +285,15 @@ describe('AuthenticationPageComponent', () => {
       )
     );
     await render('/register');
-    fillCredentials();
-    fill('#auth-confirm-password', 'Example-password1!');
+    fillRegistration();
     await submit();
     expect(root.querySelector('[role="alert"] li')?.textContent).toBe(
       '<b>Too short</b>'
     );
     expect(root.querySelector('[role="alert"] b')).toBeNull();
+    expect(requiredElement<HTMLInputElement>(root, '#auth-name').value).toBe(
+      'Example User'
+    );
     session.register.mockReturnValue(
       throwError(
         () => new ApiException('Validation', 400, 'not-json', {}, null)
@@ -252,9 +304,11 @@ describe('AuthenticationPageComponent', () => {
   });
 
   it('shows a read-only profile and lets the user sign out', async () => {
-    session.user.set(profile);
+    session.user.set({ ...profile, name: 'Élodie' });
     session.status.set('authenticated');
     await render('/account');
+    expect(root.querySelector('dl')?.textContent).toContain('auth.name');
+    expect(root.querySelector('dl')?.textContent).toContain('Élodie');
     expect(root.querySelector('dl')?.textContent).toContain(profile.email);
     expect(root.querySelector('dl')?.textContent).toContain(profile.id);
     expect(root.querySelector('input')).toBeNull();

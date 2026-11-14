@@ -10,7 +10,7 @@ import {
   viewChild,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { LucideCircleUserRound, LucideLogOut } from '@lucide/angular';
 import { TranslatePipe } from '@ngx-translate/core';
 import { finalize } from 'rxjs';
@@ -20,7 +20,7 @@ let nextMenuId = 0;
 
 @Component({
   selector: 'app-account-menu',
-  imports: [TranslatePipe, LucideCircleUserRound, LucideLogOut],
+  imports: [TranslatePipe, RouterLink, LucideCircleUserRound, LucideLogOut],
   templateUrl: './account-menu.component.html',
   host: {
     class: 'relative z-30 inline-flex shrink-0',
@@ -51,7 +51,7 @@ export class AccountMenuComponent {
   );
   protected readonly initial = computed(() => {
     const user = this.user();
-    const name = user?.userName?.trim() || user?.email?.trim() || '';
+    const name = user?.name?.trim() || user?.email?.trim() || '';
     return Array.from(name)[0]?.toUpperCase() ?? '';
   });
 

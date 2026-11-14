@@ -10,12 +10,13 @@ import {
 import { AuthenticationService } from '../../../core/server/authentication/authentication.service';
 import { requiredElement } from '../../../../testing/note-fixtures';
 import { AccountMenuComponent } from './account-menu.component';
+import { routes } from '../../../app.routes';
 
 describe('AccountMenuComponent', () => {
   const profile = {
     id: 'user-id',
     email: 'email@example.com',
-    userName: 'vivien',
+    name: 'vivien',
   };
   let fixture: ComponentFixture<AccountMenuComponent>;
   let root: HTMLElement;
@@ -66,9 +67,9 @@ describe('AccountMenuComponent', () => {
     [undefined, undefined, ''],
     ['', '   ', ''],
   ])(
-    'displays the initial for username %s and email %s',
-    async (userName, email, initial) => {
-      client.me.mockReturnValue(of({ id: profile.id, userName, email }));
+    'displays the initial for name %s and email %s',
+    async (name, email, initial) => {
+      client.me.mockReturnValue(of({ id: profile.id, name, email }));
       await render();
       expect(trigger().textContent?.trim()).toBe(initial);
       expect(root.querySelector('svg[lucideCircleUserRound]') !== null).toBe(
@@ -80,7 +81,7 @@ describe('AccountMenuComponent', () => {
 
   it('opens an icon-only account menu when both profile fields are null', async () => {
     // The server permits null fields although NSwag models them as optional strings.
-    const nullableProfile = { id: profile.id, userName: null, email: null };
+    const nullableProfile = { id: profile.id, name: null, email: null };
     client.me.mockReturnValue(
       of(nullableProfile as unknown as ApplicationUserDto)
     );
@@ -155,6 +156,28 @@ describe('AccountMenuComponent', () => {
     expect(client.me).toHaveBeenCalledOnce();
   });
 
+  it('opens the existing account page and closes the menu without signing out', async () => {
+    const router = TestBed.inject(Router);
+    router.resetConfig(routes);
+    await render();
+    await openMenu();
+    const account = requiredElement<HTMLAnchorElement>(
+      root,
+      'section a[href="/account"]'
+    );
+    expect(account.textContent).toContain('auth.account');
+    expect(root.querySelector('section li:first-child a')).toBe(account);
+
+    account.click();
+    await fixture.whenStable();
+
+    expect(router.url).toBe('/account');
+    expect(root.querySelector('section')).toBeNull();
+    expect(trigger().getAttribute('aria-expanded')).toBe('false');
+    expect(client.logout).not.toHaveBeenCalled();
+    expect(TestBed.inject(AuthenticationService).user()).toEqual(profile);
+  });
+
   it('closes on outside click and Escape, restoring focus only for Escape', async () => {
     await render();
     await openMenu();
@@ -175,7 +198,13 @@ describe('AccountMenuComponent', () => {
     await render();
     await openMenu();
     const logout = requiredElement<HTMLButtonElement>(root, 'section button');
+    const account = requiredElement<HTMLAnchorElement>(root, 'section a');
     trigger().dispatchEvent(
+      new FocusEvent('focusout', { bubbles: true, relatedTarget: account })
+    );
+    await fixture.whenStable();
+    expect(root.querySelector('section')).not.toBeNull();
+    account.dispatchEvent(
       new FocusEvent('focusout', { bubbles: true, relatedTarget: logout })
     );
     await fixture.whenStable();

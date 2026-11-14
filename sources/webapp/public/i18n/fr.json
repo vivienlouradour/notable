@@ -71,6 +71,8 @@
     "registerTitle": "Créez votre compte",
     "subtitle": "Connectez-vous à votre espace personnel.",
     "profileHint": "Vos informations personnelles, en lecture seule.",
+    "name": "Nom",
+    "nameRequired": "Saisissez votre nom.",
     "email": "Adresse e-mail",
     "password": "Mot de passe",
     "confirmPassword": "Confirmer le mot de passe",

@@ -820,8 +820,8 @@ export interface OidcMethodResponse {
 
 export interface ApplicationUserDto {
     id?: string;
-    email?: string | undefined;
-    userName?: string | undefined;
+    email?: string;
+    name?: string;
 }
 
 export interface ProblemDetails {
@@ -850,7 +850,7 @@ export interface HttpValidationProblemDetails extends ProblemDetails {
 export interface RegisterRequest {
     email?: string;
     password?: string;
-    userName?: string | undefined;
+    userName?: string;
 }
 
 export interface AppVersionDto {
