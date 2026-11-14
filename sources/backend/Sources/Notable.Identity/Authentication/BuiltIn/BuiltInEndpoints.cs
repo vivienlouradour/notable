@@ -71,14 +71,31 @@ internal static class BuiltInEndpoints
                 title: "Registration is disabled.");
         }
 
+        var errors = new Dictionary<string, string[]>();
+        if (string.IsNullOrWhiteSpace(request.UserName))
+        {
+            errors.Add(nameof(request.UserName), ["A display name is required."]);
+        }
+
+        if (request.Password is null)
+        {
+            errors.Add(nameof(request.Password), ["A password is required."]);
+        }
+
+        if (errors.Count > 0)
+        {
+            return TypedResults.ValidationProblem(errors);
+        }
+
         var user = new ApplicationUser
         {
             Email = request.Email,
-            UserName = request.UserName,
+            UserName = request.Email,
+            DisplayName = request.UserName,
             CreatedAt = timeProvider.GetUtcNow().DateTime
         };
 
-        var result = await userManager.CreateAsync(user, request.Password);
+        var result = await userManager.CreateAsync(user, request.Password!);
 
         return result.Succeeded
             ? TypedResults.Created($"/auth/users/{user.Id}", user.Id)
@@ -93,4 +110,4 @@ internal static class BuiltInEndpoints
     }
 }
 
-internal sealed record RegisterRequest(string Email, string Password, string? UserName);
+internal sealed record RegisterRequest(string Email, string Password, string UserName);
